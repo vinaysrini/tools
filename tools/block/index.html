@@ -19,12 +19,27 @@
           mermaid.parse(code);
           output.innerHTML = `<div class="mermaid">${code}</div>`;
           mermaid.contentLoaded();
+          updateHash(code);
         } catch (error) {
           output.innerHTML = '<div style="color: red;">Invalid Mermaid syntax</div>';
         }
       };
 
+      const updateHash = (code) => {
+        const encodedCode = encodeURIComponent(code);
+        history.replaceState(null, null, `#${encodedCode}`);
+      };
+
+      const loadFromHash = () => {
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+          const decodedCode = decodeURIComponent(hash);
+          textarea.value = decodedCode;
+        }
+      };
+
       textarea.addEventListener('input', updateDiagram);
+      loadFromHash();
       updateDiagram(); // Initial render
     });
   </script>

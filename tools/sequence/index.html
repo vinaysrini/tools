@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sequence</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js"></script>
+  <script src="https://bramp.github.io/js-sequence-diagrams/js/underscore-min.js"></script>
+  <script src="https://bramp.github.io/js-sequence-diagrams/js/webfont.js"></script>
+  <script src="https://bramp.github.io/js-sequence-diagrams/js/sequence-diagram-min.js"></script>
+  <style>
+    .footer {
+        font-size:8px;
+        text-align:right;
+    }
+    .diagram { border: 1px solid #ccc; padding: 5px; }
+    .input-box { width: 100%; height: auto; }
+    svg text {
+      font-size: 14px !important;/* Smaller text size */
+    }
+    svg line, svg rect {
+      stroke-width: 1 !important; /* Thinner lines */
+      height:1px;
+    }
+    .compact rect {
+      height: 10px !important; /* Shorter participant boxes */
+    }
+    .compact line {
+      stroke-width: 1 !important; /* Thinner lines */
+    }
+  </style>
+</head>
+<body>
+<table style="width:100%;">
+    <tr>
+        <td valign="top">
+          <textarea rows="7" class="input-box" id="inputBox"></textarea>
+      </td>
+        <td valign="top" style="padding-left:10px;">
+          <button id="renderButton">Render Step by Step</button>
+          <br/><button id="renderAllButton">Render All</button>
+          <br/><label>
+            <input type="checkbox" id="renderAsYouTypeCheckbox"> Render Live
+          </label>
+<br/>
+</tr>
+</table>
+<div class="diagram" id="diagram1"></div>
+  <script>
+    let lines = [];
+    let currentIndex = 0;
+    let theme = "simple";
+
+    function renderStepByStep() {
+      if (currentIndex < lines.length) {
+        const input = lines.slice(0, currentIndex + 1).join('\n');
+        const diagram = Diagram.parse(input);
+        document.getElementById('diagram1').innerHTML = ''; // Clear existing diagram
+        diagram.drawSVG('diagram1', { theme: theme });
+        currentIndex++;
+      }
+    }
+
+    document.getElementById('renderButton').addEventListener('click', () => {
+        if (currentIndex == 0) {
+              const inputText = document.getElementById('inputBox').value;
+              lines = inputText.split('\n').filter(line => line.trim() !== '');
+              currentIndex = 0;
+        }
+      renderStepByStep();
+    });
+
+    document.getElementById('inputBox').addEventListener('input', () => {
+        if (document.getElementById('renderAsYouTypeCheckbox').checked) {
+            const inputText = document.getElementById('inputBox').value;
+            const diagram = Diagram.parse(inputText);
+            document.getElementById('diagram1').innerHTML = ''; // Clear existing diagram
+            diagram.drawSVG('diagram1', { theme: theme });
+        }
+        updateURL();
+    });
+
+    document.getElementById('renderAllButton').addEventListener('click', () => {
+            const inputText = document.getElementById('inputBox').value;
+            const diagram = Diagram.parse(inputText);
+            document.getElementById('diagram1').innerHTML = ''; // Clear existing diagram
+            diagram.drawSVG('diagram1', { theme: theme });
+    });
+
+    // Fetch the textarea value from URL
+    function getTextareaValueFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('text');
+    }
+
+    // Update URL with textarea value
+    function updateURL() {
+	    console.log("Updating url...");
+	const inputText = document.getElementById('inputBox').value;
+        const params = new URLSearchParams(window.location.search);
+        params.set('text', inputText);
+        window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+
+    }
+
+    // Initialize textarea with value from URL
+    window.onload = function() {
+        var text = getTextareaValueFromURL();
+        if (!text) {
+            text = document.getElementById("sample").innerHTML.replaceAll("&gt;", ">");
+        }
+        document.getElementById('inputBox').value = text;
+        document.getElementById('renderAllButton').click();
+    }
+
+    // Initial empty diagram
+    document.getElementById('diagram1').innerHTML = '<p>Click the button to start rendering the diagram.</p>';
+  </script>
+<pre id="sample" style="display:none;">
+participant Browser
+participant Proxy
+participant Server
+Browser->Proxy: TCP Connection Request
+Proxy->Browser: TCP SYN-ACK
+Browser->Proxy: TCP ACK
+Browser->Proxy: ClientHello
+Proxy->Browser: ServerHello
+Proxy->Browser: Certificate
+Proxy->Browser: ServerHelloDone
+Browser->Proxy: ClientKeyExchange
+Browser->Proxy: ChangeCipherSpec
+Browser->Proxy: Finished
+Proxy->Browser: ChangeCipherSpec
+Proxy->Browser: Finished
+Browser->Proxy: HTTP GET /login.html (SSL)
+Proxy->Server: HTTP GET /login.html
+Server->Proxy: HTTP Response /login.html
+Proxy->Browser: HTTP Response /login.html (SSL)
+</pre>
+<div class="footer">
+Thanks to:
+<br/><a href="https://bramp.github.io/js-sequence-diagrams/">JS Sequence Diagrams library</a> by Andrew Brampton, licensed under the Simplified BSD license.
+<br/><a href="https://raphaeljs.com/">Raphael.js</a> by Dmitry Baranovskiy, licensed under the MIT License.
+</div>
+</body>
+</html>

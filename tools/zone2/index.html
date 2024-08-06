@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Rate Zone Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="number"] {
+            width: 80px;
+            padding: 5px;
+            margin-right: 10px;
+        }
+        .form-group button {
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .zone {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .zone1 { background-color: #1f77b4; }
+        .zone2 { background-color: #ff7f0e; }
+        .zone3 { background-color: #2ca02c; }
+        .zone4 { background-color: #d62728; }
+        .zone5 { background-color: #9467bd; }
+    </style>
+    <script>
+        function calculateZones() {
+            // Get input values
+            const age = parseInt(document.getElementById('age').value);
+            const restingHeartRate = parseInt(document.getElementById('restingHeartRate').value);
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            
+            // Calculate Maximum Heart Rate (MHR)
+            let maxHeartRate;
+            if (gender === 'male') {
+                maxHeartRate = 220 - age;
+            } else {
+                maxHeartRate = 226 - age; // Adjusted for females
+            }
+            
+            // Calculate Heart Rate Reserve (HRR)
+            const heartRateReserve = maxHeartRate - restingHeartRate;
+            
+            // Calculate Heart Rate Zones
+            const zones = {
+                zone1: {
+                    low: Math.round((heartRateReserve * 0.50) + restingHeartRate),
+                    high: Math.round((heartRateReserve * 0.60) + restingHeartRate)
+                },
+                zone2: {
+                    low: Math.round((heartRateReserve * 0.60) + restingHeartRate),
+                    high: Math.round((heartRateReserve * 0.70) + restingHeartRate)
+                },
+                zone3: {
+                    low: Math.round((heartRateReserve * 0.70) + restingHeartRate),
+                    high: Math.round((heartRateReserve * 0.80) + restingHeartRate)
+                },
+                zone4: {
+                    low: Math.round((heartRateReserve * 0.80) + restingHeartRate),
+                    high: Math.round((heartRateReserve * 0.90) + restingHeartRate)
+                },
+                zone5: {
+                    low: Math.round((heartRateReserve * 0.90) + restingHeartRate),
+                    high: maxHeartRate
+                }
+            };
+            
+            // Display the result
+            document.getElementById('result').innerHTML = `
+                <div class="zone zone1">Zone 1: ${zones.zone1.low} - ${zones.zone1.high} bpm</div>
+                <div class="zone zone2">Zone 2: ${zones.zone2.low} - ${zones.zone2.high} bpm</div>
+                <div class="zone zone3">Zone 3: ${zones.zone3.low} - ${zones.zone3.high} bpm</div>
+                <div class="zone zone4">Zone 4: ${zones.zone4.low} - ${zones.zone4.high} bpm</div>
+                <div class="zone zone5">Zone 5: ${zones.zone5.low} - ${zones.zone5.high} bpm</div>
+            `;
+        }
+
+        function incrementValue(id) {
+            const input = document.getElementById(id);
+            input.value = parseInt(input.value) + 1;
+            calculateZones();
+        }
+
+        function decrementValue(id) {
+            const input = document.getElementById(id);
+            input.value = parseInt(input.value) - 1;
+            calculateZones();
+        }
+
+        window.onload = function() {
+            calculateZones(); // Initial calculation with default values
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Heart Rate Zone Calculator</h1>
+        <form oninput="calculateZones(); return false;">
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <button type="button" onclick="decrementValue('age')">-</button>
+                <input type="number" id="age" name="age" value="45" required>
+                <button type="button" onclick="incrementValue('age')">+</button>
+            </div>
+            <div class="form-group">
+                <label for="restingHeartRate">Resting Heart Rate:</label>
+                <button type="button" onclick="decrementValue('restingHeartRate')">-</button>
+                <input type="number" id="restingHeartRate" name="restingHeartRate" value="60" required>
+                <button type="button" onclick="incrementValue('restingHeartRate')">+</button>
+            </div>
+            <div class="form-group">
+                <label>Gender:</label>
+                <input type="radio" id="male" name="gender" value="male" checked>
+                <label for="male">Male</label>
+                <input type="radio" id="female" name="gender" value="female">
+                <label for="female">Female</label>
+            </div>
+        </form>
+        <div id="result" class="result"></div>
+    </div>
+</body>
+</html>

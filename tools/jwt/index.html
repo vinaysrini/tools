@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Decoder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            margin: 5px 0;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>JWT Decoder</h2>
+
+    <textarea id="jwtInput" placeholder="Enter your JWT token here..."></textarea>
+
+    <div>
+        <button onclick="decodeJWT()">Decode JWT</button>
+    </div>
+
+    <h3>Header</h3>
+    <pre id="header"></pre>
+
+    <h3>Payload</h3>
+    <pre id="payload"></pre>
+
+    <h3>Signature</h3>
+    <pre id="signature"></pre>
+
+    <script>
+        function decodeJWT() {
+            const jwt = document.getElementById("jwtInput").value;
+            const parts = jwt.split('.');
+
+            if (parts.length !== 3) {
+                alert("Invalid JWT token format!");
+                return;
+            }
+
+            // Decode Base64URL
+            const header = JSON.parse(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/')));
+            const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+            const signature = parts[2]; // Signature is not decoded, it's in Base64URL format.
+
+            // Show the decoded header, payload, and signature
+            document.getElementById("header").textContent = JSON.stringify(header, null, 2);
+            document.getElementById("payload").textContent = JSON.stringify(payload, null, 2);
+            document.getElementById("signature").textContent = signature;
+        }
+    </script>
+
+</body>
+</html>

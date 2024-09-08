@@ -18,7 +18,7 @@
     }
     svg line, svg rect {
       stroke-width: 1 !important; /* Thinner lines */
-      height:1px;
+      /* height:1px; */
     }
     .compact rect {
       height: 10px !important; /* Shorter participant boxes */
@@ -35,6 +35,9 @@
           <textarea rows="7" class="input-box" id="inputBox"></textarea>
       </td>
         <td valign="top" style="padding-left:10px;">
+          <label>
+            <select id="theme" onchange="document.getElementById('renderAllButton').click()"><option selected>simple</option><option>hand</option></select> Theme
+          </label><br/>
           <button id="renderButton">Render Step by Step</button>
           <br/><button id="renderAllButton">Render All</button>
           <br/><label>
@@ -47,14 +50,16 @@
   <script>
     let lines = [];
     let currentIndex = 0;
-    let theme = "simple";
+    function getTheme() {
+      return document.getElementById("theme").value;
+    }
 
     function renderStepByStep() {
       if (currentIndex < lines.length) {
         const input = lines.slice(0, currentIndex + 1).join('\n');
         const diagram = Diagram.parse(input);
         document.getElementById('diagram1').innerHTML = ''; // Clear existing diagram
-        diagram.drawSVG('diagram1', { theme: theme });
+        diagram.drawSVG('diagram1', { theme: getTheme() });
         currentIndex++;
       }
     }
@@ -73,7 +78,7 @@
             const inputText = document.getElementById('inputBox').value;
             const diagram = Diagram.parse(inputText);
             document.getElementById('diagram1').innerHTML = ''; // Clear existing diagram
-            diagram.drawSVG('diagram1', { theme: theme });
+            diagram.drawSVG('diagram1', { theme: getTheme() });
         }
         updateURL();
     });
@@ -82,7 +87,7 @@
             const inputText = document.getElementById('inputBox').value;
             const diagram = Diagram.parse(inputText);
             document.getElementById('diagram1').innerHTML = ''; // Clear existing diagram
-            diagram.drawSVG('diagram1', { theme: theme });
+            diagram.drawSVG('diagram1', { theme: getTheme() });
     });
 
     // Fetch the textarea value from URL
@@ -115,30 +120,19 @@
     document.getElementById('diagram1').innerHTML = '<p>Click the button to start rendering the diagram.</p>';
   </script>
 <pre id="sample" style="display:none;">
-participant Browser
-participant Proxy
-participant Server
-Browser->Proxy: TCP Connection Request
-Proxy->Browser: TCP SYN-ACK
-Browser->Proxy: TCP ACK
-Browser->Proxy: ClientHello
-Proxy->Browser: ServerHello
-Proxy->Browser: Certificate
-Proxy->Browser: ServerHelloDone
-Browser->Proxy: ClientKeyExchange
-Browser->Proxy: ChangeCipherSpec
-Browser->Proxy: Finished
-Proxy->Browser: ChangeCipherSpec
-Proxy->Browser: Finished
-Browser->Proxy: HTTP GET /login.html (SSL)
-Proxy->Server: HTTP GET /login.html
-Server->Proxy: HTTP Response /login.html
-Proxy->Browser: HTTP Response /login.html (SSL)
+Title: Here is a title
+participant Andrew
+participant China
+Andrew->China: Says Hello
+Note right of China: China thinks\nabout it
+China-->Andrew: How are you?
+Andrew->>China: I am good thanks!
+Note over Andrew,China: Note over both A and B
 </pre>
 <div class="footer">
 Thanks to:
-<br/><a href="https://bramp.github.io/js-sequence-diagrams/">JS Sequence Diagrams library</a> by Andrew Brampton, licensed under the Simplified BSD license.
-<br/><a href="https://raphaeljs.com/">Raphael.js</a> by Dmitry Baranovskiy, licensed under the MIT License.
+<br/><a target="_blank" href="https://bramp.github.io/js-sequence-diagrams/">JS Sequence Diagrams library</a> by Andrew Brampton, licensed under the Simplified BSD license.
+<br/><a target="_blank" href="https://raphaeljs.com/">Raphael.js</a> by Dmitry Baranovskiy, licensed under the MIT License.
 </div>
 </body>
 </html>

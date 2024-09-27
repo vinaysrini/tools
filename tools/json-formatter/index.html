@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Pretty Printer with Escape and Debug Options</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ccc;
+            overflow-x: auto;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+        }
+        label {
+            margin-right: 15px;
+        }
+        #debugOutput {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>JSON Pretty Printer with Escape and Debug Options</h1>
+    <textarea id="jsonInput" placeholder="Paste your JSON here"></textarea>
+    <br><br>
+
+    <div>
+        <label>
+            <input type="checkbox" id="escapeQuotes" checked> Escape Quotes
+        </label>
+        <label>
+            <input type="checkbox" id="escapeBackslashes" checked> Escape Backslashes
+        </label>
+        <label>
+            <input type="checkbox" id="escapeNewlines" checked> Escape Newlines
+        </label>
+    </div>
+
+    <br>
+    <button onclick="prettyPrintJSON()">Pretty Print</button>
+
+    <h3>Debug Output (After Removing Escapes):</h3>
+    <div id="debugOutput"></div>
+
+    <h3>Formatted JSON:</h3>
+    <pre id="jsonOutput"></pre>
+
+    <script>
+        // Default JSON input
+        const defaultInput = `{
+            "name": "John",
+            "age": 30,
+            "city": "New York",
+            "description": "John is a developer.\\nHe loves coding.",
+            "hobbies": ["reading", "running", "coding"]
+        }`;
+
+        // Set default JSON to the textarea
+        document.getElementById('jsonInput').value = defaultInput;
+
+        function prettyPrintJSON() {
+            let input = document.getElementById('jsonInput').value;
+
+            // Check which options are selected
+            const escapeQuotes = document.getElementById('escapeQuotes').checked;
+            const escapeBackslashes = document.getElementById('escapeBackslashes').checked;
+            const escapeNewlines = document.getElementById('escapeNewlines').checked;
+
+            // Perform escaping based on selected options
+            if (escapeQuotes) {
+                input = input.replace(/\\"/g, '"');  // Escape quotes
+            }
+            if (escapeBackslashes) {
+                input = input.replace(/\\/g, '');  // Escape backslashes
+            }
+            if (escapeNewlines) {
+                input = input.replace(/\\n/g, '\n');  // Escape newlines
+            }
+
+            // Show the debug output with escapes removed
+            const debugOutput = input
+                .replace(/\\"/g, '"')  // Unescape quotes
+                .replace(/\\\\/g, '\\')  // Unescape backslashes
+                .replace(/\\n/g, '\n');  // Unescape newlines
+
+            document.getElementById('debugOutput').textContent = debugOutput;
+
+            try {
+                const parsedJSON = JSON.parse(debugOutput);  // Parse the unescaped input
+                const prettyJSON = JSON.stringify(parsedJSON, null, 4);  // Pretty print
+
+                // Display the pretty-printed JSON in the pre element
+                document.getElementById('jsonOutput').textContent = prettyJSON;
+            } catch (e) {
+                document.getElementById('jsonOutput').textContent = "Invalid JSON: " + e.message;
+            }
+        }
+    </script>
+</body>
+</html>

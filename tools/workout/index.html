@@ -3,44 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Full‑Body Workout Generator</title>
+  <title>Custom Full Body Workout Generator</title>
+  <!-- Link to our custom stylesheet -->
   <link rel="stylesheet" href="style.css">
+  <!-- Load the exercise catalogue; this script defines the global `exercises` array -->
+  <script src="exercises.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Full‑Body Workout Generator</h1>
-    <p class="subtitle">Create on‑demand supersets tailored to your equipment and time constraints. Warmups and cooldowns are intentionally omitted.</p>
-    <div id="controls" class="controls">
-      <div class="form‑group">
-        <label class="label">Available equipment:</label>
-        <div class="equipment‑list">
-          <label><input type="checkbox" name="equipment" value="barbell" checked> Barbell</label>
-          <label><input type="checkbox" name="equipment" value="dumbbell" checked> Dumbbell</label>
-          <label><input type="checkbox" name="equipment" value="kettlebell" checked> Kettlebell</label>
-          <label><input type="checkbox" name="equipment" value="body weight" checked> Body weight</label>
-          <label><input type="checkbox" name="equipment" value="gym"> Gym (all)</label>
-        </div>
-      </div>
-      <div class="form‑group">
-        <label class="label" for="duration">Workout duration:</label>
-        <select id="duration">
-          <option value="45">45 minutes</option>
-          <option value="60">60 minutes</option>
-        </select>
-      </div>
-      <div class="form‑group">
-        <label class="label" for="supersetSize">Exercises per superset:</label>
-        <select id="supersetSize">
-          <option value="2">2 exercises</option>
-          <option value="3">3 exercises</option>
-        </select>
-      </div>
-      <div class="form‑group generate">
-        <button id="generateBtn" class="btn">Generate workout</button>
-      </div>
-    </div>
-    <div id="workout" class="workout"></div>
-  </div>
+  <header>
+    <h1>Custom Full‑Body Workout Generator</h1>
+  </header>
+
+  <main>
+    <!-- Control panel where the user selects parameters for their workout -->
+    <section class="controls">
+      <h2>Workout Options</h2>
+      <form id="workoutForm" onsubmit="return false;">
+        <label>
+          Environment:
+          <select id="environment">
+            <option value="home">Home</option>
+            <option value="gym">Gym</option>
+          </select>
+        </label>
+        <label>
+          Push/Pull:
+          <select id="pushPull">
+            <option value="no-preference">No Preference</option>
+            <option value="push">Push Day</option>
+            <option value="pull">Pull Day</option>
+          </select>
+        </label>
+        <label>
+          Body Region:
+          <select id="bodyRegion">
+            <option value="full">Full Body</option>
+            <option value="upper">Upper Body</option>
+            <option value="lower">Lower Body</option>
+          </select>
+        </label>
+        <button type="button" id="generateBtn">Generate Workout</button>
+      </form>
+    </section>
+
+    <!-- Container where the generated workout supersets will be inserted -->
+    <section id="workoutOutput"></section>
+  </main>
+
+  <footer>
+    <!-- Link to the editor page that lets users modify the exercise catalogue -->
+    <a href="editor.html">Exercise Editor</a>
+  </footer>
+
+  <!-- Our script that handles workout generation -->
   <script src="script.js"></script>
 </body>
 </html>

@@ -22,8 +22,8 @@
         <label>
           Environment:
           <select id="environment">
-            <option value="home">Home</option>
             <option value="gym">Gym</option>
+            <option value="home">Home</option>
           </select>
         </label>
         <label>
@@ -40,6 +40,21 @@
             <option value="full">Full Body</option>
             <option value="upper">Upper Body</option>
             <option value="lower">Lower Body</option>
+          </select>
+        </label>
+        <label>
+          Exercises Per Set:
+          <select id="exercisesPerSet">
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+          </select>
+        </label>
+        <label>
+          Number of Sets:
+          <select id="numSets">
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
           </select>
         </label>
         <button type="button" id="generateBtn">Generate Workout</button>

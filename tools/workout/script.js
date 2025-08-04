@@ -79,10 +79,9 @@ function generateWorkout() {
   const muscleGroups = Object.keys(byMuscle);
   shuffle(muscleGroups);
 
-  // Determine how many exercises per superset and total supersets
-  const exercisesPerSet = env === 'home' ? 2 : 3;
-  // Aim for roughly a 45–60 minute session; adjust number of sets by environment
-  const numSets = env === 'home' ? 4 : 5;
+  // Get custom values for exercises per set and number of sets from the select dropdowns
+  const exercisesPerSet = parseInt(document.getElementById('exercisesPerSet').value);
+  const numSets = parseInt(document.getElementById('numSets').value);
 
   const supersets = [];
   let usedMusclesOverall = new Set();

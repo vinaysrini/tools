@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Decoder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 20px;
+        }
+        .output {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Certificate Decoder</h1>
+
+    <label for="inputCert">Paste your certificate here (PEM encoded):</label>
+    <textarea id="inputCert" placeholder="Paste certificate here..."></textarea>
+
+    <button onclick="decodeCert()">Decode Certificate</button>
+
+    <h2>Certificate Information:</h2>
+    <div class="output">
+        <p><strong>Common Name:</strong> <span id="commonName">N/A</span></p>
+        <p><strong>Subject Alternative Names:</strong> <span id="san">N/A</span></p>
+        <p><strong>Valid From:</strong> <span id="validFrom">N/A</span></p>
+        <p><strong>Valid To:</strong> <span id="validTo">N/A</span></p>
+        <p><strong>Serial Number:</strong> <span id="serialNumber">N/A</span></p>
+    </div>
+
+    <script>
+        // Function to decode Base64 encoded certificate
+        function decodeBase64Pem(pem) {
+            const base64Cert = pem.replace(/-----BEGIN CERTIFICATE-----/g, '')
+                                  .replace(/-----END CERTIFICATE-----/g, '')
+                                  .replace(/\s+/g, '');
+            return atob(base64Cert);
+        }
+
+        // Function to extract certificate details
+        function extractCertDetails(cert) {
+            const commonNamePattern = /CN=([^,]+)/;
+            const sanPattern = /DNS:([^,]+)/g;
+            const validFromPattern = /Not Before: (.*)/;
+            const validToPattern = /Not After : (.*)/;
+            const serialPattern = /Serial Number: ([0-9A-Fa-f]+)/;
+
+            const commonNameMatch = cert.match(commonNamePattern);
+            const sanMatch = [...cert.matchAll(sanPattern)].map(m => m[1]);
+            const validFromMatch = cert.match(validFromPattern);
+            const validToMatch = cert.match(validToPattern);
+            const serialMatch = cert.match(serialPattern);
+
+            return {
+                commonName: commonNameMatch ? commonNameMatch[1].trim() : "Unknown",
+                san: sanMatch.length ? sanMatch.join(', ') : "Unknown",
+                validFrom: validFromMatch ? validFromMatch[1].trim() : "Unknown",
+                validTo: validToMatch ? validToMatch[1].trim() : "Unknown",
+                serialNumber: serialMatch ? serialMatch[1].trim() : "Unknown",
+            };
+        }
+
+        // Function triggered by the "Decode Certificate" button
+        function decodeCert() {
+            const inputCert = document.getElementById('inputCert').value;
+
+            // Decode the Base64 PEM certificate
+            const decodedCert = decodeBase64Pem(inputCert);
+
+            // Extract the details
+            const certDetails = extractCertDetails(decodedCert);
+
+            // Display the details
+            document.getElementById('commonName').textContent = certDetails.commonName;
+            document.getElementById('san').textContent = certDetails.san;
+            document.getElementById('validFrom').textContent = certDetails.validFrom;
+            document.getElementById('validTo').textContent = certDetails.validTo;
+            document.getElementById('serialNumber').textContent = certDetails.serialNumber;
+        }
+    </script>
+
+</body>
+</html>

@@ -11,7 +11,14 @@
 // Wait until the DOM is fully loaded before attaching event listeners
 document.addEventListener('DOMContentLoaded', () => {
   const generateBtn = document.getElementById('generateBtn');
+  // Add click event for desktop
   generateBtn.addEventListener('click', generateWorkout);
+  // Add touch events for mobile devices (especially Safari on iOS)
+  generateBtn.addEventListener('touchstart', function(e) {
+    // Prevent default to avoid double-firing with click events
+    e.preventDefault();
+    generateWorkout();
+  });
 });
 
 /**

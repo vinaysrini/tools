@@ -337,12 +337,47 @@ function renderWorkout(supersets) {
     return;
   }
   
+  // Store the current workout state for later use
+  window.workoutState = window.workoutState || {};
+  window.workoutState.supersets = supersets;
+  
   supersets.forEach((superset, index) => {
     const container = document.createElement('div');
     container.className = 'superset';
+    
+    // Create header with set controls
+    const headerContainer = document.createElement('div');
+    headerContainer.className = 'superset-header';
+    
     const header = document.createElement('h3');
     header.textContent = `Set ${index + 1}`;
-    container.appendChild(header);
+    headerContainer.appendChild(header);
+    
+    // Add set control buttons
+    const setControls = document.createElement('div');
+    setControls.className = 'set-controls';
+    
+    const regenerateBtn = document.createElement('button');
+    regenerateBtn.innerHTML = '&#8635;';
+    regenerateBtn.className = 'set-control-btn icon-btn';
+    regenerateBtn.title = 'Regenerate this set with new exercises';
+    regenerateBtn.onclick = function() {
+      regenerateSet(index);
+    };
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.innerHTML = '&#10005;';
+    removeBtn.className = 'set-control-btn icon-btn';
+    removeBtn.title = 'Remove this set';
+    removeBtn.onclick = function() {
+      removeSet(index);
+    };
+    
+    setControls.appendChild(regenerateBtn);
+    setControls.appendChild(removeBtn);
+    headerContainer.appendChild(setControls);
+    
+    container.appendChild(headerContainer);
     
     // Create a mobile-friendly exercise list
     const exerciseList = document.createElement('ul');
@@ -364,7 +399,8 @@ function renderWorkout(supersets) {
       muscleGroup.className = 'muscle-group';
       muscleGroup.textContent = ex.muscleGroup;
       muscleGroup.title = 'Click to change muscle group';
-      muscleGroup.onclick = function() {
+      muscleGroup.onclick = function(e) {
+        e.stopPropagation(); // Prevent row click event
         changeMuscleGroup(index, exIndex, ex.muscleGroup);
       };
       
@@ -373,26 +409,20 @@ function renderWorkout(supersets) {
       exerciseName.className = 'exercise-name';
       exerciseName.textContent = ex.name;
       
-      // Toggle button for details
-      const toggleDetails = document.createElement('button');
-      toggleDetails.className = 'toggle-details';
-      toggleDetails.textContent = 'Details';
-      toggleDetails.onclick = function(e) {
-        e.stopPropagation();
-        const details = this.parentNode.parentNode.querySelector('.exercise-details');
+      // Make the main row clickable to toggle details
+      mainRow.style.cursor = 'pointer';
+      mainRow.onclick = function() {
+        const details = this.parentNode.querySelector('.exercise-details');
         if (details.style.display === 'none' || !details.style.display) {
           details.style.display = 'block';
-          this.textContent = 'Hide';
         } else {
           details.style.display = 'none';
-          this.textContent = 'Details';
         }
       };
       
       // Add elements to main row
       mainRow.appendChild(muscleGroup);
       mainRow.appendChild(exerciseName);
-      mainRow.appendChild(toggleDetails);
       exerciseItem.appendChild(mainRow);
       
       // Create collapsible details section
@@ -445,4 +475,225 @@ function renderWorkout(supersets) {
     container.appendChild(exerciseList);
     output.appendChild(container);
   });
+  
+  // Add 'Add New Set' button at the bottom
+  const addSetContainer = document.createElement('div');
+  addSetContainer.className = 'add-set-container';
+  
+  const addSetBtn = document.createElement('button');
+  addSetBtn.innerHTML = '&#43;';
+  addSetBtn.className = 'add-set-btn icon-btn';
+  addSetBtn.title = 'Add New Set';
+  addSetBtn.onclick = function() {
+    addNewSet();
+  };
+  
+  addSetContainer.appendChild(addSetBtn);
+  output.appendChild(addSetContainer);
+}
+
+/**
+ * Regenerates a specific workout set with new exercises
+ * @param {number} setIndex - The index of the set to regenerate
+ */
+function regenerateSet(setIndex) {
+  if (!window.workoutState || !window.workoutState.supersets) {
+    alert('Please generate a workout first.');
+    return;
+  }
+  
+  // Get current workout state
+  const state = window.workoutState;
+  const currentSupersets = state.supersets;
+  
+  if (setIndex < 0 || setIndex >= currentSupersets.length) {
+    console.error('Invalid set index:', setIndex);
+    return;
+  }
+  
+  // Get the current set's muscle groups to maintain the same structure
+  const currentSet = currentSupersets[setIndex];
+  const muscleGroups = currentSet.map(ex => ex.muscleGroup);
+  
+  // Create a new set with the same muscle groups but different exercises
+  const newSet = [];
+  
+  // Get selected values from the form
+  const env = document.getElementById('environment').value;
+  const pushPull = document.getElementById('pushPull').value;
+  const bodyRegion = document.getElementById('bodyRegion').value;
+  
+  // For each muscle group in the current set, find a new exercise
+  muscleGroups.forEach(muscleGroup => {
+    // Filter exercises by muscle group and other criteria
+    const availableExercises = exercises.filter(ex => {
+      // Match muscle group
+      if (ex.muscleGroup !== muscleGroup) return false;
+      
+      // Match environment
+      if (!ex.environment.includes(env)) return false;
+      
+      // Match push/pull if specified
+      if (pushPull !== 'no-preference' && ex.pushPull !== pushPull) return false;
+      
+      // Match body region if specified
+      if (bodyRegion !== 'full' && ex.bodyRegion !== bodyRegion) return false;
+      
+      // Don't use exercises already in the current set
+      const isInCurrentSet = currentSet.some(currentEx => currentEx.name === ex.name);
+      if (isInCurrentSet) return false;
+      
+      return true;
+    });
+    
+    if (availableExercises.length > 0) {
+      // Randomly select a new exercise
+      const randomIndex = Math.floor(Math.random() * availableExercises.length);
+      newSet.push(availableExercises[randomIndex]);
+    } else {
+      // If no new exercise is available, keep the current one
+      const currentExercise = currentSet.find(ex => ex.muscleGroup === muscleGroup);
+      if (currentExercise) {
+        newSet.push(currentExercise);
+      }
+    }
+  });
+  
+  // Replace the old set with the new one
+  currentSupersets[setIndex] = newSet;
+  
+  // Re-render the workout
+  renderWorkout(currentSupersets);
+}
+
+/**
+ * Removes a specific workout set
+ * @param {number} setIndex - The index of the set to remove
+ */
+function removeSet(setIndex) {
+  if (!window.workoutState || !window.workoutState.supersets) {
+    alert('Please generate a workout first.');
+    return;
+  }
+  
+  // Get current workout state
+  const state = window.workoutState;
+  const currentSupersets = state.supersets;
+  
+  if (setIndex < 0 || setIndex >= currentSupersets.length) {
+    console.error('Invalid set index:', setIndex);
+    return;
+  }
+  
+  // Remove the set at the specified index
+  currentSupersets.splice(setIndex, 1);
+  
+  // Re-render the workout
+  renderWorkout(currentSupersets);
+}
+
+/**
+ * Adds a new workout set
+ */
+function addNewSet() {
+  if (!window.workoutState) {
+    alert('Please generate a workout first.');
+    return;
+  }
+  
+  // Get current workout state
+  const state = window.workoutState;
+  const currentSupersets = state.supersets || [];
+  
+  // Get selected values from the form
+  const env = document.getElementById('environment').value;
+  const pushPull = document.getElementById('pushPull').value;
+  const bodyRegion = document.getElementById('bodyRegion').value;
+  
+  // Create a new set with similar structure to existing sets
+  let newSet = [];
+  let targetMuscleGroups = [];
+  
+  // If there are existing sets, use a similar structure
+  if (currentSupersets.length > 0) {
+    // Get a random existing set to use as a template
+    const templateSetIndex = Math.floor(Math.random() * currentSupersets.length);
+    const templateSet = currentSupersets[templateSetIndex];
+    
+    // Use the same muscle groups as the template
+    targetMuscleGroups = templateSet.map(ex => ex.muscleGroup);
+  } else {
+    // Default structure if no existing sets
+    // Include a mix of upper body, lower body, and core/cardio
+    const allMuscleGroups = [...new Set(exercises.map(ex => ex.muscleGroup))];
+    const upperBodyGroups = allMuscleGroups.filter(mg => 
+      ['Chest', 'Back', 'Shoulders', 'Arms', 'Biceps', 'Triceps'].includes(mg));
+    const lowerBodyGroups = allMuscleGroups.filter(mg => 
+      ['Legs', 'Quads', 'Hamstrings', 'Glutes', 'Calves'].includes(mg));
+    const coreCardioGroups = allMuscleGroups.filter(mg => 
+      ['Core', 'Cardio'].includes(mg));
+    
+    // Select 1-2 upper body, 1-2 lower body, and 1 core/cardio exercise
+    if (upperBodyGroups.length > 0) {
+      targetMuscleGroups.push(upperBodyGroups[Math.floor(Math.random() * upperBodyGroups.length)]);
+      if (Math.random() > 0.5 && upperBodyGroups.length > 1) {
+        let secondGroup;
+        do {
+          secondGroup = upperBodyGroups[Math.floor(Math.random() * upperBodyGroups.length)];
+        } while (secondGroup === targetMuscleGroups[targetMuscleGroups.length - 1]);
+        targetMuscleGroups.push(secondGroup);
+      }
+    }
+    
+    if (lowerBodyGroups.length > 0) {
+      targetMuscleGroups.push(lowerBodyGroups[Math.floor(Math.random() * lowerBodyGroups.length)]);
+      if (Math.random() > 0.5 && lowerBodyGroups.length > 1) {
+        let secondGroup;
+        do {
+          secondGroup = lowerBodyGroups[Math.floor(Math.random() * lowerBodyGroups.length)];
+        } while (secondGroup === targetMuscleGroups[targetMuscleGroups.length - 1]);
+        targetMuscleGroups.push(secondGroup);
+      }
+    }
+    
+    if (coreCardioGroups.length > 0) {
+      targetMuscleGroups.push(coreCardioGroups[Math.floor(Math.random() * coreCardioGroups.length)]);
+    }
+  }
+  
+  // For each target muscle group, find an appropriate exercise
+  targetMuscleGroups.forEach(muscleGroup => {
+    // Filter exercises by muscle group and other criteria
+    const availableExercises = exercises.filter(ex => {
+      // Match muscle group
+      if (ex.muscleGroup !== muscleGroup) return false;
+      
+      // Match environment
+      if (!ex.environment.includes(env)) return false;
+      
+      // Match push/pull if specified
+      if (pushPull !== 'no-preference' && ex.pushPull !== pushPull) return false;
+      
+      // Match body region if specified
+      if (bodyRegion !== 'full' && ex.bodyRegion !== bodyRegion) return false;
+      
+      return true;
+    });
+    
+    if (availableExercises.length > 0) {
+      // Randomly select an exercise
+      const randomIndex = Math.floor(Math.random() * availableExercises.length);
+      newSet.push(availableExercises[randomIndex]);
+    }
+  });
+  
+  // Add the new set if it has exercises
+  if (newSet.length > 0) {
+    currentSupersets.push(newSet);
+    
+    // Re-render the workout
+    renderWorkout(currentSupersets);
+  } else {
+    alert('Could not create a new set with the current filters. Try adjusting your criteria.');
+  }
 }

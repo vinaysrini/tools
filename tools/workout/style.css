@@ -198,6 +198,80 @@ footer a:hover {
   transform: translateY(1px);
 }
 
+/* Set management controls styling */
+.superset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.set-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto; /* Right-align the controls */
+}
+
+.set-control-btn {
+  padding: 0.3rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icon button styling */
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.set-control-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.set-control-btn:active {
+  transform: translateY(1px);
+}
+
+/* Add new set button styling */
+.add-set-container {
+  display: flex;
+  justify-content: flex-end; /* Right-align the add button */
+  margin: 1.5rem 0 0.5rem;
+}
+
+.add-set-btn {
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 50%; /* Make it circular */
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.add-set-btn:hover {
+  background-color: #45a049;
+}
+
+.add-set-btn:active {
+  background-color: #3d8b40;
+  transform: translateY(1px);
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .exercise-main-row {

@@ -91,22 +91,74 @@ main {
   color: #4CAF50;
 }
 
-/* Table styling */
-#workoutOutput table {
-  width: 100%;
-  border-collapse: collapse;
+/* Mobile-friendly exercise list styling */
+.exercise-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-#workoutOutput th,
-#workoutOutput td {
+.exercise-item {
   border: 1px solid #ddd;
-  padding: 0.5rem;
-  text-align: left;
-  vertical-align: top;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
 }
 
-#workoutOutput th {
-  background-color: #f2f2f2;
+.exercise-main-row {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.muscle-group {
+  background-color: #4CAF50;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  margin-right: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  min-width: 80px;
+  text-align: center;
+}
+
+.muscle-group:hover {
+  background-color: #45a049;
+}
+
+.exercise-name {
+  flex: 1;
+  font-weight: bold;
+}
+
+.toggle-details {
+  padding: 0.4rem 0.8rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.toggle-details:hover {
+  background-color: #e0e0e0;
+}
+
+.exercise-details {
+  padding: 1rem;
+  border-top: 1px solid #ddd;
+  background-color: white;
+}
+
+.detail-item {
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
 }
 
 footer {
@@ -134,6 +186,7 @@ footer a:hover {
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.2s ease;
+  display: inline-block;
 }
 
 .change-exercise:hover {
@@ -143,4 +196,24 @@ footer a:hover {
 .change-exercise:active {
   background-color: #3d8b40;
   transform: translateY(1px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .exercise-main-row {
+    flex-wrap: wrap;
+  }
+  
+  .muscle-group {
+    margin-bottom: 0.5rem;
+  }
+  
+  .exercise-name {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .toggle-details {
+    width: 100%;
+  }
 }

@@ -35,6 +35,32 @@ function shuffle(array) {
 }
 
 /**
+ * Changes the muscle group of an exercise in a specific set to the next available muscle group
+ * @param {number} setIndex - The index of the set
+ * @param {number} exIndex - The index of the exercise within the set
+ * @param {string} currentMuscleGroup - The current muscle group of the exercise
+ */
+function changeMuscleGroup(setIndex, exIndex, currentMuscleGroup) {
+  if (!window.workoutState) {
+    alert('Please generate a workout first.');
+    return;
+  }
+  
+  // Get all available muscle groups from the exercises array
+  const allMuscleGroups = [...new Set(exercises.map(ex => ex.muscleGroup))];
+  
+  // Find the current muscle group's index
+  const currentIndex = allMuscleGroups.indexOf(currentMuscleGroup);
+  
+  // Get the next muscle group (cycle back to the beginning if at the end)
+  const nextIndex = (currentIndex + 1) % allMuscleGroups.length;
+  const newMuscleGroup = allMuscleGroups[nextIndex];
+  
+  // Change the exercise to one from the new muscle group
+  changeExercise(setIndex, exIndex, newMuscleGroup);
+}
+
+/**
  * Changes an exercise in a specific set
  * @param {number} setIndex - The index of the set
  * @param {number} exIndex - The index of the exercise within the set
@@ -91,19 +117,30 @@ function changeExercise(setIndex, exIndex, muscleGroup) {
     
     supersetElements.forEach((supersetElement, i) => {
       const exercises = [];
-      const rows = supersetElement.querySelectorAll('tbody tr');
+      const exerciseItems = supersetElement.querySelectorAll('.exercise-item');
       
-      rows.forEach((row, j) => {
+      exerciseItems.forEach((item, j) => {
         if (i === setIndex && j === exIndex) {
           // Replace with new exercise
           exercises.push(newExercise);
         } else {
           // Keep existing exercise
-          const muscleGroup = row.cells[0].textContent;
-          const name = row.cells[1].textContent;
-          const description = row.cells[2].textContent;
-          const equipment = row.cells[3].textContent.split(', ');
-          const videoLink = row.cells[4].querySelector('a').href;
+          const mainRow = item.querySelector('.exercise-main-row');
+          const detailsSection = item.querySelector('.exercise-details');
+          
+          const muscleGroup = mainRow.querySelector('.muscle-group').textContent;
+          const name = mainRow.querySelector('.exercise-name').textContent;
+          
+          // Extract description from details section
+          const descriptionText = detailsSection.querySelector('.detail-item:nth-child(1)').textContent;
+          const description = descriptionText.replace('Description: ', '');
+          
+          // Extract equipment from details section
+          const equipmentText = detailsSection.querySelector('.detail-item:nth-child(2)').textContent;
+          const equipment = equipmentText.replace('Equipment: ', '').split(', ');
+          
+          // Extract video link from details section
+          const videoLink = detailsSection.querySelector('.detail-item:nth-child(3) a').href;
           
           exercises.push({
             muscleGroup,
@@ -114,7 +151,7 @@ function changeExercise(setIndex, exIndex, muscleGroup) {
           });
         }
       });
-      
+        
       supersets.push(exercises);
     });
     
@@ -306,57 +343,106 @@ function renderWorkout(supersets) {
     const header = document.createElement('h3');
     header.textContent = `Set ${index + 1}`;
     container.appendChild(header);
-    const table = document.createElement('table');
-    const thead = document.createElement('thead');
-    thead.innerHTML = '<tr><th>Muscle Group</th><th>Exercise</th><th>Description</th><th>Equipment</th><th>Video</th><th>Action</th></tr>';
-    table.appendChild(thead);
-    const tbody = document.createElement('tbody');
+    
+    // Create a mobile-friendly exercise list
+    const exerciseList = document.createElement('ul');
+    exerciseList.className = 'exercise-list';
     
     superset.forEach((ex, exIndex) => {
-      const row = document.createElement('tr');
-      row.dataset.setIndex = index;
-      row.dataset.exIndex = exIndex;
+      // Create list item for each exercise
+      const exerciseItem = document.createElement('li');
+      exerciseItem.className = 'exercise-item';
+      exerciseItem.dataset.setIndex = index;
+      exerciseItem.dataset.exIndex = exIndex;
       
-      const muscleCell = document.createElement('td');
-      muscleCell.textContent = ex.muscleGroup;
+      // Create the main exercise row (always visible)
+      const mainRow = document.createElement('div');
+      mainRow.className = 'exercise-main-row';
       
-      const nameCell = document.createElement('td');
-      nameCell.textContent = ex.name;
+      // Muscle group cell (clickable to change muscle group)
+      const muscleGroup = document.createElement('div');
+      muscleGroup.className = 'muscle-group';
+      muscleGroup.textContent = ex.muscleGroup;
+      muscleGroup.title = 'Click to change muscle group';
+      muscleGroup.onclick = function() {
+        changeMuscleGroup(index, exIndex, ex.muscleGroup);
+      };
       
-      const descCell = document.createElement('td');
-      descCell.textContent = ex.description;
+      // Exercise name
+      const exerciseName = document.createElement('div');
+      exerciseName.className = 'exercise-name';
+      exerciseName.textContent = ex.name;
       
-      const equipCell = document.createElement('td');
-      equipCell.textContent = Array.isArray(ex.equipment) ? ex.equipment.join(', ') : ex.equipment;
+      // Toggle button for details
+      const toggleDetails = document.createElement('button');
+      toggleDetails.className = 'toggle-details';
+      toggleDetails.textContent = 'Details';
+      toggleDetails.onclick = function(e) {
+        e.stopPropagation();
+        const details = this.parentNode.parentNode.querySelector('.exercise-details');
+        if (details.style.display === 'none' || !details.style.display) {
+          details.style.display = 'block';
+          this.textContent = 'Hide';
+        } else {
+          details.style.display = 'none';
+          this.textContent = 'Details';
+        }
+      };
       
-      const videoCell = document.createElement('td');
+      // Add elements to main row
+      mainRow.appendChild(muscleGroup);
+      mainRow.appendChild(exerciseName);
+      mainRow.appendChild(toggleDetails);
+      exerciseItem.appendChild(mainRow);
+      
+      // Create collapsible details section
+      const detailsSection = document.createElement('div');
+      detailsSection.className = 'exercise-details';
+      detailsSection.style.display = 'none'; // Hidden by default
+      
+      // Description
+      const description = document.createElement('div');
+      description.className = 'detail-item';
+      description.innerHTML = `<strong>Description:</strong> ${ex.description}`;
+      detailsSection.appendChild(description);
+      
+      // Equipment
+      const equipment = document.createElement('div');
+      equipment.className = 'detail-item';
+      equipment.innerHTML = `<strong>Equipment:</strong> ${Array.isArray(ex.equipment) ? ex.equipment.join(', ') : ex.equipment}`;
+      detailsSection.appendChild(equipment);
+      
+      // Video link
+      const videoLink = document.createElement('div');
+      videoLink.className = 'detail-item';
       const link = document.createElement('a');
       link.href = ex.video;
-      link.textContent = 'Video';
+      link.textContent = 'Watch Video';
       link.target = '_blank';
-      videoCell.appendChild(link);
+      videoLink.innerHTML = '<strong>Video:</strong> ';
+      videoLink.appendChild(link);
+      detailsSection.appendChild(videoLink);
       
-      const actionCell = document.createElement('td');
+      // Change exercise button
+      const actionDiv = document.createElement('div');
+      actionDiv.className = 'detail-item';
       const changeBtn = document.createElement('button');
-      changeBtn.textContent = 'Change';
+      changeBtn.textContent = 'Change Exercise';
       changeBtn.className = 'change-exercise';
       changeBtn.onclick = function() {
         changeExercise(index, exIndex, ex.muscleGroup);
       };
-      actionCell.appendChild(changeBtn);
+      actionDiv.appendChild(changeBtn);
+      detailsSection.appendChild(actionDiv);
       
-      row.appendChild(muscleCell);
-      row.appendChild(nameCell);
-      row.appendChild(descCell);
-      row.appendChild(equipCell);
-      row.appendChild(videoCell);
-      row.appendChild(actionCell);
+      // Add details section to exercise item
+      exerciseItem.appendChild(detailsSection);
       
-      tbody.appendChild(row);
+      // Add exercise item to list
+      exerciseList.appendChild(exerciseItem);
     });
     
-    table.appendChild(tbody);
-    container.appendChild(table);
+    container.appendChild(exerciseList);
     output.appendChild(container);
   });
 }

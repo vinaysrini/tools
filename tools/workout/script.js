@@ -6,7 +6,236 @@
  * exercises.js. When the user clicks the Generate button, the script
  * filters exercises according to the chosen environment, push/pull focus and
  * body region, then assembles supersets with a variety of muscle groups.
+ * 
+ * The script also includes functionality to share workouts via URL.
  */
+
+/**
+ * Encodes workout data for sharing in a URL
+ * @param {Object} workoutData - The workout data to encode
+ * @returns {string} Base64 encoded workout data
+ */
+function encodeWorkoutData(workoutData) {
+  // Convert the workout data to a JSON string
+  const jsonString = JSON.stringify(workoutData);
+  
+  // Handle Unicode characters by encoding to UTF-8 first
+  // This converts the string to a format that btoa can handle
+  const utf8String = encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, (_, p1) => {
+    return String.fromCharCode(parseInt(p1, 16));
+  });
+  
+  // Encode the UTF-8 string using Base64
+  const base64 = btoa(utf8String);
+  
+  // Make the Base64 string URL-safe by replacing characters
+  const urlSafe = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  
+  return urlSafe;
+}
+
+/**
+ * Decodes workout data from a shared URL
+ * @param {string} encodedData - The encoded workout data
+ * @returns {Object} The decoded workout data
+ */
+function decodeWorkoutData(encodedData) {
+  try {
+    // Restore padding if needed
+    let base64 = encodedData;
+    while (base64.length % 4 !== 0) {
+      base64 += '=';
+    }
+    
+    // Replace URL-safe characters with Base64 characters
+    base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+    
+    // Decode Base64 to UTF-8 string
+    const rawString = atob(base64);
+    
+    // Convert from UTF-8 to Unicode
+    const utf8String = Array.from(rawString).map(char => {
+      return '%' + char.charCodeAt(0).toString(16).padStart(2, '0');
+    }).join('');
+    
+    // Decode the UTF-8 string
+    const jsonString = decodeURIComponent(utf8String);
+    
+    // Parse JSON string to object
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Error decoding workout data:', error);
+    throw new Error('Invalid workout data');
+  }
+}
+
+/**
+ * Creates a shareable URL containing the current workout state
+ * @returns {string} The shareable URL
+ */
+function createShareableUrl() {
+  if (!window.workoutState) {
+    alert('Please generate a workout first.');
+    return null;
+  }
+  
+  // Get all current supersets from the DOM to ensure we have the latest state
+  const supersets = [];
+  const supersetElements = document.querySelectorAll('.superset');
+  
+  supersetElements.forEach((supersetElement) => {
+    const exercises = [];
+    const exerciseItems = supersetElement.querySelectorAll('.exercise-item');
+    
+    exerciseItems.forEach((item) => {
+      const mainRow = item.querySelector('.exercise-main-row');
+      const detailsSection = item.querySelector('.exercise-details');
+      
+      const muscleGroup = mainRow.querySelector('.muscle-group').textContent;
+      const name = mainRow.querySelector('.exercise-name').textContent;
+      
+      // Extract description from details section
+      const descriptionText = detailsSection.querySelector('.detail-item:nth-child(1)').textContent;
+      const description = descriptionText.replace('Description: ', '');
+      
+      // Extract equipment from details section
+      const equipmentText = detailsSection.querySelector('.detail-item:nth-child(2)').textContent;
+      const equipment = equipmentText.replace('Equipment: ', '').split(', ');
+      
+      // Extract video link from details section
+      const videoLink = detailsSection.querySelector('.detail-item:nth-child(3) a').href;
+      
+      exercises.push({
+        muscleGroup,
+        name,
+        description,
+        equipment,
+        video: videoLink
+      });
+    });
+      
+    supersets.push(exercises);
+  });
+  
+  // Create a simplified version of the workout state for sharing
+  const shareState = {
+    env: window.workoutState.env,
+    pushPull: window.workoutState.pushPull,
+    bodyRegion: window.workoutState.bodyRegion,
+    exercisesPerSet: window.workoutState.exercisesPerSet,
+    numSets: window.workoutState.numSets,
+    supersets: supersets
+  };
+  
+  // Encode the workout state
+  const encodedData = encodeWorkoutData(shareState);
+  
+  // Create the shareable URL
+  const url = new URL(window.location.href);
+  url.search = ''; // Clear any existing query parameters
+  url.searchParams.set('workout', encodedData);
+  
+  return url.toString();
+}
+
+/**
+ * Shares the current workout using the Web Share API if available,
+ * or copies the link to clipboard as fallback
+ */
+function shareWorkout() {
+  const shareUrl = createShareableUrl();
+  
+  if (!shareUrl) {
+    return;
+  }
+  
+  // Try to use the Web Share API if available
+  if (navigator.share) {
+    navigator.share({
+      title: 'Check out my workout!',
+      text: 'Here\'s a workout I generated. Try it out!',
+      url: shareUrl
+    }).catch((error) => {
+      console.error('Error sharing:', error);
+      copyToClipboard(shareUrl);
+    });
+  } else {
+    // Fallback to clipboard copy
+    copyToClipboard(shareUrl);
+  }
+}
+
+/**
+ * Copies text to clipboard and shows a notification
+ * @param {string} text - The text to copy
+ */
+function copyToClipboard(text) {
+  // Create a temporary input element
+  const input = document.createElement('input');
+  input.style.position = 'fixed';
+  input.style.opacity = 0;
+  input.value = text;
+  document.body.appendChild(input);
+  
+  // Select and copy the text
+  input.select();
+  input.setSelectionRange(0, 99999);
+  document.execCommand('copy');
+  
+  // Remove the temporary element
+  document.body.removeChild(input);
+  
+  // Show a notification
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.textContent = 'Share link copied to clipboard!';
+  document.body.appendChild(notification);
+  
+  // Remove the notification after a delay
+  setTimeout(() => {
+    notification.classList.add('fade-out');
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 500);
+  }, 2000);
+}
+
+/**
+ * Checks for a shared workout in the URL and loads it if found
+ * @returns {boolean} True if a shared workout was loaded, false otherwise
+ */
+function checkForSharedWorkout() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedData = urlParams.get('workout');
+  
+  if (sharedData) {
+    try {
+      // Decode the shared workout data
+      const decodedWorkout = decodeWorkoutData(sharedData);
+      
+      // Set form values based on the shared workout
+      document.getElementById('environment').value = decodedWorkout.env;
+      document.getElementById('pushPull').value = decodedWorkout.pushPull;
+      document.getElementById('bodyRegion').value = decodedWorkout.bodyRegion;
+      document.getElementById('exercisesPerSet').value = decodedWorkout.exercisesPerSet;
+      document.getElementById('numSets').value = decodedWorkout.numSets;
+      
+      // Restore the workout state
+      window.workoutState = decodedWorkout;
+      
+      // Render the shared workout
+      const supersets = decodedWorkout.supersets;
+      if (supersets && supersets.length > 0) {
+        renderWorkout(supersets);
+        return true;
+      }
+    } catch (error) {
+      console.error('Error loading shared workout:', error);
+    }
+  }
+  
+  return false;
+}
 
 // Wait until the DOM is fully loaded before attaching event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,6 +250,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const controlsSection = document.querySelector('.controls');
   controlsSection.classList.add('hidden');
   
+  // Create container for buttons
+  const buttonContainer = document.createElement('div');
+  buttonContainer.className = 'button-container';
+  
   // Create and add the Edit button
   const editBtn = document.createElement('button');
   editBtn.id = 'editBtn';
@@ -28,9 +261,20 @@ document.addEventListener('DOMContentLoaded', () => {
   editBtn.innerHTML = '<i class="fas fa-sliders"></i> <span class="btn-text">Edit</span>';
   editBtn.addEventListener('click', toggleWorkoutOptions);
   
-  // Insert the Edit button in the header container
+  // Create and add the Share button
+  const shareBtn = document.createElement('button');
+  shareBtn.id = 'shareBtn';
+  shareBtn.className = 'share-workout-btn';
+  shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> <span class="btn-text">Share</span>';
+  shareBtn.addEventListener('click', shareWorkout);
+  
+  // Add buttons to container
+  buttonContainer.appendChild(editBtn);
+  buttonContainer.appendChild(shareBtn);
+  
+  // Insert the button container in the header
   const editBtnContainer = document.getElementById('editBtnContainer');
-  editBtnContainer.appendChild(editBtn);
+  editBtnContainer.appendChild(buttonContainer);
   
   // Set up the Generate button event listeners
   const generateBtn = document.getElementById('generateBtn');
@@ -50,8 +294,11 @@ document.addEventListener('DOMContentLoaded', () => {
     controlsSection.classList.add('hidden');
   });
   
-  // Automatically generate a workout when the page loads
-  generateWorkout();
+  // Check for shared workout or generate a new one
+  if (!checkForSharedWorkout()) {
+    // If no shared workout was found, generate a new one
+    generateWorkout();
+  }
 });
 
 /**

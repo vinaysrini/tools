@@ -10,16 +10,67 @@
 
 // Wait until the DOM is fully loaded before attaching event listeners
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize touch gestures on the workout output container
+  const workoutOutput = document.getElementById('workoutOutput');
+  touchGestures.init(workoutOutput);
+  
+  // Set up swipe handlers
+  touchGestures.onSwipe('left', handleSwipeOnExercise);
+  touchGestures.onSwipe('right', handleSwipeOnExercise);
+  // Hide the workout options by default
+  const controlsSection = document.querySelector('.controls');
+  controlsSection.classList.add('hidden');
+  
+  // Create and add the Edit button
+  const editBtn = document.createElement('button');
+  editBtn.id = 'editBtn';
+  editBtn.className = 'edit-workout-btn';
+  editBtn.innerHTML = '<i class="fas fa-sliders"></i> <span class="btn-text">Edit</span>';
+  editBtn.addEventListener('click', toggleWorkoutOptions);
+  
+  // Insert the Edit button in the header container
+  const editBtnContainer = document.getElementById('editBtnContainer');
+  editBtnContainer.appendChild(editBtn);
+  
+  // Set up the Generate button event listeners
   const generateBtn = document.getElementById('generateBtn');
   // Add click event for desktop
-  generateBtn.addEventListener('click', generateWorkout);
+  generateBtn.addEventListener('click', function() {
+    generateWorkout();
+    // Hide the options after generating
+    controlsSection.classList.add('hidden');
+  });
+  
   // Add touch events for mobile devices (especially Safari on iOS)
   generateBtn.addEventListener('touchstart', function(e) {
     // Prevent default to avoid double-firing with click events
     e.preventDefault();
     generateWorkout();
+    // Hide the options after generating
+    controlsSection.classList.add('hidden');
   });
+  
+  // Automatically generate a workout when the page loads
+  generateWorkout();
 });
+
+/**
+ * Toggles the visibility of the workout options panel
+ */
+function toggleWorkoutOptions() {
+  const controlsSection = document.querySelector('.controls');
+  controlsSection.classList.toggle('hidden');
+  
+  // Update button text based on visibility state
+  const editBtn = document.getElementById('editBtn');
+  if (controlsSection.classList.contains('hidden')) {
+    editBtn.innerHTML = '<i class="fas fa-sliders"></i> <span class="btn-text">Edit</span>';
+    // If options were just hidden and changes were made, regenerate the workout
+    generateWorkout();
+  } else {
+    editBtn.innerHTML = '<i class="fas fa-check"></i> <span class="btn-text">Done</span>';
+  }
+}
 
 /**
  * Shuffle an array in place using the Fisher‑Yates algorithm.
@@ -61,6 +112,29 @@ function changeMuscleGroup(setIndex, exIndex, currentMuscleGroup) {
 }
 
 /**
+ * Handle swipe gestures on exercise items
+ * @param {HTMLElement} target - The element that was swiped
+ */
+function handleSwipeOnExercise(target) {
+  // Find the closest exercise item
+  const exerciseItem = target.closest('.exercise-item');
+  if (!exerciseItem) return;
+  
+  // Get the set index and exercise index from data attributes
+  const setIndex = parseInt(exerciseItem.getAttribute('data-set'));
+  const exIndex = parseInt(exerciseItem.getAttribute('data-exercise'));
+  
+  // Get the muscle group from the element
+  const muscleGroupEl = exerciseItem.querySelector('.muscle-group');
+  if (!muscleGroupEl) return;
+  
+  const muscleGroup = muscleGroupEl.textContent;
+  
+  // Change the exercise
+  changeExercise(setIndex, exIndex, muscleGroup);
+}
+
+/**
  * Changes an exercise in a specific set
  * @param {number} setIndex - The index of the set
  * @param {number} exIndex - The index of the exercise within the set
@@ -79,9 +153,11 @@ function changeExercise(setIndex, exIndex, muscleGroup) {
   const currentExercise = {};
   const supersetElement = document.querySelectorAll('.superset')[setIndex];
   if (supersetElement) {
-    const row = supersetElement.querySelectorAll('tbody tr')[exIndex];
-    if (row) {
-      currentExercise.name = row.cells[1].textContent;
+    // Get the exercise item
+    const exerciseItem = supersetElement.querySelectorAll('.exercise-item')[exIndex];
+    if (exerciseItem) {
+      const mainRow = exerciseItem.querySelector('.exercise-main-row');
+      currentExercise.name = mainRow.querySelector('.exercise-name').textContent;
     }
   }
   
@@ -155,8 +231,29 @@ function changeExercise(setIndex, exIndex, muscleGroup) {
       supersets.push(exercises);
     });
     
+    // Store the display state of all exercise details before re-rendering
+    const detailsStates = [];
+    document.querySelectorAll('.superset').forEach((set, i) => {
+      const setStates = [];
+      set.querySelectorAll('.exercise-details').forEach((details) => {
+        setStates.push(details.style.display === 'block');
+      });
+      detailsStates.push(setStates);
+    });
+    
     // Re-render the workout with the updated exercise
     renderWorkout(supersets);
+    
+    // Restore the display state of all exercise details after re-rendering
+    document.querySelectorAll('.superset').forEach((set, i) => {
+      if (detailsStates[i]) {
+        set.querySelectorAll('.exercise-details').forEach((details, j) => {
+          if (detailsStates[i][j]) {
+            details.style.display = 'block';
+          }
+        });
+      }
+    });
   } else {
     alert('No more exercises available for this muscle group. Try generating a new workout.');
   }
@@ -332,7 +429,8 @@ function renderWorkout(supersets) {
   
   if (supersets.length === 0) {
     const msg = document.createElement('p');
-    msg.textContent = 'No exercises found for the selected criteria. Try adjusting your filters.';
+    msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> No exercises available for the selected criteria. Try changing your options.';
+    msg.style.textAlign = 'center';
     output.appendChild(msg);
     return;
   }
@@ -345,35 +443,39 @@ function renderWorkout(supersets) {
     const container = document.createElement('div');
     container.className = 'superset';
     
-    // Create header with set controls
+    // Create a header for the superset
     const headerContainer = document.createElement('div');
     headerContainer.className = 'superset-header';
     
-    const header = document.createElement('h3');
-    header.textContent = `Set ${index + 1}`;
-    headerContainer.appendChild(header);
+    const setTitle = document.createElement('h3');
+    setTitle.textContent = `${index + 1}`;
+    headerContainer.appendChild(setTitle);
     
-    // Add set control buttons
+    // Add set controls (refresh and remove)
     const setControls = document.createElement('div');
     setControls.className = 'set-controls';
     
-    const regenerateBtn = document.createElement('button');
-    regenerateBtn.innerHTML = '&#8635;';
-    regenerateBtn.className = 'set-control-btn icon-btn';
-    regenerateBtn.title = 'Regenerate this set with new exercises';
-    regenerateBtn.onclick = function() {
-      regenerateSet(index);
-    };
+    const refreshBtn = document.createElement('button');
+    refreshBtn.className = 'set-control-btn';
+    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+    refreshBtn.title = 'Regenerate this set';
+    refreshBtn.addEventListener('click', function() {
+      const setIndex = parseInt(this.getAttribute('data-set'));
+      regenerateSet(setIndex);
+    });
+    refreshBtn.setAttribute('data-set', index);
     
     const removeBtn = document.createElement('button');
-    removeBtn.innerHTML = '&#10005;';
-    removeBtn.className = 'set-control-btn icon-btn';
+    removeBtn.className = 'set-control-btn';
+    removeBtn.innerHTML = '<i class="fas fa-trash"></i>';
     removeBtn.title = 'Remove this set';
-    removeBtn.onclick = function() {
-      removeSet(index);
-    };
+    removeBtn.addEventListener('click', function() {
+      const setIndex = parseInt(this.getAttribute('data-set'));
+      removeSet(setIndex);
+    });
+    removeBtn.setAttribute('data-set', index);
     
-    setControls.appendChild(regenerateBtn);
+    setControls.appendChild(refreshBtn);
     setControls.appendChild(removeBtn);
     headerContainer.appendChild(setControls);
     
@@ -384,9 +486,11 @@ function renderWorkout(supersets) {
     exerciseList.className = 'exercise-list';
     
     superset.forEach((ex, exIndex) => {
-      // Create list item for each exercise
+      // Create the exercise item
       const exerciseItem = document.createElement('li');
       exerciseItem.className = 'exercise-item';
+      exerciseItem.setAttribute('data-set', index);
+      exerciseItem.setAttribute('data-exercise', exIndex);
       exerciseItem.dataset.setIndex = index;
       exerciseItem.dataset.exIndex = exIndex;
       
@@ -420,9 +524,9 @@ function renderWorkout(supersets) {
         }
       };
       
-      // Add elements to main row
-      mainRow.appendChild(muscleGroup);
+      // Add elements to main row - exercise name first, then muscle group
       mainRow.appendChild(exerciseName);
+      mainRow.appendChild(muscleGroup);
       exerciseItem.appendChild(mainRow);
       
       // Create collapsible details section
@@ -457,9 +561,11 @@ function renderWorkout(supersets) {
       const actionDiv = document.createElement('div');
       actionDiv.className = 'detail-item';
       const changeBtn = document.createElement('button');
-      changeBtn.textContent = 'Change Exercise';
       changeBtn.className = 'change-exercise';
-      changeBtn.onclick = function() {
+      changeBtn.innerHTML = '<i class="fas fa-random"></i> <span class="btn-text">Change</span>';
+      changeBtn.title = 'Change this exercise';
+      changeBtn.onclick = function(e) {
+        e.stopPropagation(); // Prevent row click event from triggering
         changeExercise(index, exIndex, ex.muscleGroup);
       };
       actionDiv.appendChild(changeBtn);
@@ -477,19 +583,17 @@ function renderWorkout(supersets) {
   });
   
   // Add 'Add New Set' button at the bottom
-  const addSetContainer = document.createElement('div');
-  addSetContainer.className = 'add-set-container';
+  const addContainer = document.createElement('div');
+  addContainer.className = 'add-set-container';
   
-  const addSetBtn = document.createElement('button');
-  addSetBtn.innerHTML = '&#43;';
-  addSetBtn.className = 'add-set-btn icon-btn';
-  addSetBtn.title = 'Add New Set';
-  addSetBtn.onclick = function() {
-    addNewSet();
-  };
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-set-btn';
+  addBtn.innerHTML = '<i class="fas fa-plus"></i>';
+  addBtn.title = 'Add another set';
+  addBtn.onclick = addNewSet;
   
-  addSetContainer.appendChild(addSetBtn);
-  output.appendChild(addSetContainer);
+  addContainer.appendChild(addBtn);
+  output.appendChild(addContainer);
 }
 
 /**

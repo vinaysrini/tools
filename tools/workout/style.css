@@ -1,9 +1,8 @@
 /*
- * Basic styles for the workout generator website.
- * This stylesheet defines the look and feel of the interface, including the
- * control panel, workout output and table formatting. Feel free to adjust
- * colours, spacing or fonts to suit your own aesthetic. All sizes are
- * relative so the layout remains responsive across devices.
+ * Mobile-first styles for the workout generator website.
+ * This stylesheet defines the look and feel of the interface, starting with
+ * mobile layouts as the default, then enhancing for larger screens.
+ * All sizes are relative so the layout remains responsive across devices.
  */
 
 /* Reset some default margins and paddings */
@@ -13,26 +12,42 @@ body {
   font-family: Arial, sans-serif;
   background-color: #f5f5f5;
   color: #333;
+  -webkit-tap-highlight-color: transparent;
+  font-size: 16px;
 }
 
 header {
   background-color: #4CAF50;
   color: #fff;
-  padding: 1rem;
-  text-align: center;
+  padding: 0.6rem;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 main {
-  max-width: 900px;
+  width: 100%;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.6rem;
+  box-sizing: border-box;
 }
 
 /* Control panel styling */
 .controls {
   background-color: #fff;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -44,14 +59,17 @@ main {
 .controls form {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.8rem;
   align-items: flex-end;
+  justify-content: space-between;
 }
 
 .controls label {
   display: flex;
   flex-direction: column;
   font-weight: bold;
+  font-size: 0.9rem;
+  flex-basis: 100%;
 }
 
 .controls select {
@@ -59,28 +77,48 @@ main {
   padding: 0.4rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-  min-width: 140px;
+  width: 100%;
+  font-size: 0.9rem;
 }
 
-#generateBtn {
-  padding: 0.6rem 1.2rem;
-  background-color: #4CAF50;
-  color: #fff;
+/* Icon buttons styling */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.primary-btn {
+  padding: 0.6rem 1rem;
+  background-color: #4CAF50;
+  color: #fff;
+  font-size: 0.9rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.primary-btn:hover {
+  background-color: #45a049;
+}
+
+.icon-btn i {
   font-size: 1rem;
 }
 
-#generateBtn:hover {
-  background-color: #45a049;
+.btn-text, .link-text {
+  display: none;
 }
 
 /* Superset styling */
 #workoutOutput .superset {
   background-color: #fff;
-  margin-bottom: 1rem;
-  padding: 1rem;
+  margin-bottom: 0.6rem;
+  padding: 0.6rem;
   border-radius: 8px;
   border-left: 4px solid #4CAF50;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -89,6 +127,7 @@ main {
 #workoutOutput h3 {
   margin: 0 0 0.5rem;
   color: #4CAF50;
+  font-size: 1rem;
 }
 
 /* Mobile-friendly exercise list styling */
@@ -101,45 +140,54 @@ main {
 .exercise-item {
   border: 1px solid #ddd;
   border-radius: 6px;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   overflow: hidden;
 }
 
 .exercise-main-row {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  padding: 0.75rem;
+  padding: 0.5rem;
   background-color: #f9f9f9;
   cursor: pointer;
+  justify-content: space-between;
 }
 
 .muscle-group {
-  background-color: #4CAF50;
-  color: white;
-  padding: 0.4rem 0.8rem;
+  background-color: #e8f5e9;
+  color: #4CAF50;
+  padding: 0.2rem 0.4rem;
   border-radius: 4px;
-  margin-right: 0.75rem;
-  font-weight: bold;
+  margin-left: 0.5rem;
+  font-weight: normal;
   cursor: pointer;
-  min-width: 80px;
+  min-width: 40px;
   text-align: center;
+  font-size: 0.75rem;
+  border: 1px solid #4CAF50;
 }
 
 .muscle-group:hover {
-  background-color: #45a049;
+  background-color: #c8e6c9;
 }
 
 .exercise-name {
-  flex: 1;
+  flex-grow: 1;
   font-weight: bold;
+  font-size: 0.9rem;
 }
 
 .toggle-details {
-  padding: 0.4rem 0.8rem;
+  padding: 0.3rem 0.5rem;
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .toggle-details:hover {
@@ -147,13 +195,14 @@ main {
 }
 
 .exercise-details {
-  padding: 1rem;
+  padding: 0.8rem;
   border-top: 1px solid #ddd;
   background-color: white;
+  font-size: 0.85rem;
 }
 
 .detail-item {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   line-height: 1.4;
 }
 
@@ -163,13 +212,16 @@ main {
 
 footer {
   text-align: center;
-  padding: 1rem;
-  font-size: 0.9rem;
+  padding: 0.8rem;
+  font-size: 0.85rem;
 }
 
-footer a {
+.icon-link {
   color: #4CAF50;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 footer a:hover {
@@ -178,15 +230,17 @@ footer a:hover {
 
 /* Change exercise button styling */
 .change-exercise {
-  padding: 0.4rem 0.8rem;
+  padding: 0.3rem 0.5rem;
   background-color: #4CAF50;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: background-color 0.2s ease;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .change-exercise:hover {
@@ -201,9 +255,17 @@ footer a:hover {
 /* Set management controls styling */
 .superset-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.4rem;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+}
+
+.set-controls {
+  display: flex;
+  gap: 0.3rem;
+  margin-left: auto;
 }
 
 .set-controls {
@@ -223,6 +285,8 @@ footer a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
 }
 
 /* Icon button styling */
@@ -272,22 +336,105 @@ footer a:hover {
   transform: translateY(1px);
 }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-  .exercise-main-row {
-    flex-wrap: wrap;
+/* Edit Workout Button */
+.edit-workout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.2s ease;
+  margin: 0;
+}
+
+.edit-workout-btn:hover {
+  background-color: #45a049;
+}
+
+.edit-workout-btn:active {
+  background-color: #3d8b40;
+  transform: translateY(1px);
+}
+
+/* Hidden class for controls section */
+.hidden {
+  display: none;
+}
+
+/* Media queries for larger screens */
+@media (min-width: 481px) {
+  .controls label {
+    flex-basis: 48%;
+  }
+  
+  header h1 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (min-width: 769px) {
+  main {
+    max-width: 900px;
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
   }
   
   .muscle-group {
-    margin-bottom: 0.5rem;
+    min-width: 50px;
+    font-size: 0.8rem;
   }
   
   .exercise-name {
-    width: 100%;
-    margin-bottom: 0.5rem;
+    flex: 1;
+    margin-bottom: 0;
+    font-size: 1rem;
   }
   
   .toggle-details {
-    width: 100%;
+    width: auto;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .btn-text, .link-text {
+    display: inline;
+  }
+  
+  .controls label {
+    flex-basis: auto;
+  }
+  
+  .controls select {
+    min-width: 120px;
+    width: auto;
+  }
+  
+  #generateBtn {
+    margin-top: 0;
+    width: auto;
+  }
+  
+  .set-controls {
+    width: auto;
+  }
+  
+  .superset-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .exercise-details {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .detail-item {
+    margin-bottom: 0.75rem;
   }
 }

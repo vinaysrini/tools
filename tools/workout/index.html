@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Custom Full Body Workout Generator</title>
+  <!-- iOS home screen icon and web app meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Workout">
+  <meta name="theme-color" content="#4A90E2">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon.svg">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="manifest" href="manifest.json">
   <!-- Font Awesome for icons - optimized loading -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/fontawesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/solid.min.css">
@@ -70,11 +79,6 @@
     <!-- Container where the generated workout supersets will be inserted -->
     <section id="workoutOutput"></section>
   </main>
-
-  <footer>
-    <!-- Link to the editor page that lets users modify the exercise catalogue -->
-    <a href="editor.html" class="icon-link"><i class="fas fa-edit"></i> <span class="link-text">Exercise Editor</span></a>
-  </footer>
 
   <!-- Touch gestures for mobile devices -->
   <script src="touch-gestures.js"></script>

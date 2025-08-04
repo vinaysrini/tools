@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="128" fill="#4A90E2"/>
+  
+  <!-- Dumbbell icon -->
+  <g transform="translate(96, 156)" fill="#FFFFFF">
+    <rect x="0" y="80" width="320" height="40" rx="20" ry="20"/>
+    <rect x="20" y="60" width="40" height="80" rx="10" ry="10"/>
+    <rect x="260" y="60" width="40" height="80" rx="10" ry="10"/>
+    <rect x="60" y="40" width="20" height="120" rx="10" ry="10"/>
+    <rect x="240" y="40" width="20" height="120" rx="10" ry="10"/>
+  </g>
+</svg>

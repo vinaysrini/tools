@@ -1,0 +1,17 @@
+{
+  "name": "Workout",
+  "short_name": "Workout",
+  "description": "Custom Full Body Workout Generator",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4A90E2",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

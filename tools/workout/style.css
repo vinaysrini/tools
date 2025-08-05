@@ -152,6 +152,7 @@ main {
   background-color: #f9f9f9;
   cursor: pointer;
   justify-content: space-between;
+  position: relative; /* For absolute positioning of drag handle */
 }
 
 .muscle-group {
@@ -176,6 +177,24 @@ main {
   flex-grow: 1;
   font-weight: bold;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shuffle-icon {
+  margin-left: 8px;
+  color: #888;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.shuffle-icon:hover {
+  color: #4CAF50;
+  background-color: #e8f5e9;
 }
 
 .toggle-details {
@@ -310,6 +329,34 @@ footer a:hover {
   display: flex;
   justify-content: flex-end; /* Right-align the add button */
   margin: 1.5rem 0 0.5rem;
+}
+
+/* Drag and drop styling */
+.drag-handle {
+  cursor: grab;
+  padding: 0 0.5rem 0 0;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.exercise-item.dragging {
+  opacity: 0.8;
+  position: relative;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.exercise-placeholder {
+  border: 1px dashed #ccc;
+  border-radius: 6px;
+  background-color: #f5f5f5;
+  margin-bottom: 0.5rem;
 }
 
 .add-set-btn {

@@ -755,10 +755,24 @@ function renderWorkout(supersets) {
         changeMuscleGroup(index, exIndex, ex.muscleGroup);
       };
       
-      // Exercise name
+      // Exercise name with shuffle icon
       const exerciseName = document.createElement('div');
       exerciseName.className = 'exercise-name';
-      exerciseName.textContent = ex.name;
+      
+      // Create text span for the exercise name
+      const nameText = document.createElement('span');
+      nameText.textContent = ex.name;
+      exerciseName.appendChild(nameText);
+      
+      // Create shuffle icon
+      const shuffleIcon = document.createElement('i');
+      shuffleIcon.className = 'fas fa-random shuffle-icon';
+      shuffleIcon.title = 'Change this exercise';
+      shuffleIcon.onclick = function(e) {
+        e.stopPropagation(); // Prevent row click event
+        changeExercise(index, exIndex, ex.muscleGroup);
+      };
+      exerciseName.appendChild(shuffleIcon);
       
       // Make the main row clickable to toggle details
       mainRow.style.cursor = 'pointer';

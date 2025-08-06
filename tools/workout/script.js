@@ -268,9 +268,21 @@ document.addEventListener('DOMContentLoaded', () => {
   shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> <span class="btn-text">Share</span>';
   shareBtn.addEventListener('click', shareWorkout);
   
+  // Create and add the Reset button
+  const resetBtn = document.createElement('button');
+  resetBtn.id = 'resetBtn';
+  resetBtn.className = 'reset-workout-btn';
+  resetBtn.innerHTML = '<i class="fas fa-redo-alt"></i> <span class="btn-text">Reset</span>';
+  resetBtn.title = 'Reset entire workout';
+  resetBtn.addEventListener('click', function() {
+    // Call generateWorkout with reset=true to completely regenerate without pinning muscle groups
+    generateWorkout(true);
+  });
+  
   // Add buttons to container
   buttonContainer.appendChild(editBtn);
   buttonContainer.appendChild(shareBtn);
+  buttonContainer.appendChild(resetBtn);
   
   // Insert the button container in the header
   const editBtnContainer = document.getElementById('editBtnContainer');
@@ -512,8 +524,9 @@ function changeExercise(setIndex, exIndex, muscleGroup) {
  * region from the DOM, filters the exercise catalogue accordingly, and
  * constructs an array of supersets with either a core OR cardio exercise (not both).
  * The results are then rendered into the #workoutOutput container as a series of tables.
+ * @param {boolean} reset - If true, completely regenerates the workout without pinning muscle groups
  */
-function generateWorkout() {
+function generateWorkout(reset = false) {
   // Get selected values
   const env = document.getElementById('environment').value;
   const pushPull = document.getElementById('pushPull').value;

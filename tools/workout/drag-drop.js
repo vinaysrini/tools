@@ -142,8 +142,9 @@ class DragDropHandler {
     // Calculate the y offset
     this.yOffset = this.currentY - this.dragStartY;
     
-    // Apply the transform to move the element
-    this.draggedItem.style.transform = `translateY(${this.yOffset}px)`;
+    // Update the dragged item's position
+    const newY = this.initialY + this.yOffset;
+    this.draggedItem.style.top = `${newY}px`;
     
     // Check if we need to swap with another exercise
     this.checkForSwap();
@@ -155,15 +156,20 @@ class DragDropHandler {
   handleDragEnd() {
     if (!this.isDragging) return;
     
-    // Reset the transform
+    // Reset the transform and positioning
     this.draggedItem.style.transform = '';
+    this.draggedItem.style.position = '';
+    this.draggedItem.style.zIndex = '';
+    this.draggedItem.style.width = '';
+    this.draggedItem.style.top = '';
+    this.draggedItem.style.left = '';
     
     // Remove the dragging class
     this.draggedItem.classList.remove('dragging');
     
-    // Remove the placeholder
+    // Replace the placeholder with the dragged item
     if (this.placeholder && this.placeholder.parentNode) {
-      this.placeholder.parentNode.removeChild(this.placeholder);
+      this.placeholder.parentNode.replaceChild(this.draggedItem, this.placeholder);
     }
     
     // Reset the dragging state
@@ -182,8 +188,15 @@ class DragDropHandler {
     this.placeholder.className = 'exercise-placeholder';
     this.placeholder.style.height = `${this.draggedItemHeight}px`;
     
-    // Insert the placeholder after the dragged item
-    this.draggedItem.parentNode.insertBefore(this.placeholder, this.draggedItem.nextSibling);
+    // Insert the placeholder in place of the dragged item
+    this.draggedItem.parentNode.insertBefore(this.placeholder, this.draggedItem);
+    
+    // Make the dragged item absolute positioned to float above other elements
+    this.draggedItem.style.position = 'absolute';
+    this.draggedItem.style.zIndex = '1000';
+    this.draggedItem.style.width = `${this.draggedItem.offsetWidth}px`;
+    this.draggedItem.style.top = `${this.initialY}px`;
+    this.draggedItem.style.left = `${this.draggedItem.getBoundingClientRect().left}px`;
   }
 
   /**

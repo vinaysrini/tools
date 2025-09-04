@@ -5,6 +5,7 @@ import type { AppState, BinaryFiles } from '@excalidraw/excalidraw/types/types';
 import { Drawing } from '../db/database';
 import { DrawingService, FileService } from '../db/services';
 
+
 interface CanvasProps {
   drawing: Drawing | null;
   onDrawingUpdate: (drawing: Drawing) => void;

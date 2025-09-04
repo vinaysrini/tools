@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  custom-excalidraw:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    volumes:
+      # Optional: mount logs for debugging
+      - ./logs:/var/log/nginx
+    environment:
+      - NODE_ENV=production

@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: './',
   plugins: [
     react(),
     VitePWA({
@@ -42,5 +43,8 @@ export default defineConfig({
   },
   server: {
     port: 3000
+  },
+  build: {
+    outDir: '../../tools/multi-excalidraw'
   }
 })

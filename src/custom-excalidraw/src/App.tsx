@@ -9,9 +9,24 @@ function App() {
   const [selectedDrawingId, setSelectedDrawingId] = useState<string | null>(null);
   const [selectedDrawing, setSelectedDrawing] = useState<Drawing | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     loadDrawings();
+  }, []);
+
+  // Keyboard shortcuts for navigation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Tab key to toggle sidebar
+      if (event.key === 'Tab' && !event.shiftKey) {
+        event.preventDefault();
+        setIsSidebarCollapsed(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -76,7 +91,7 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <Sidebar
         drawings={drawings}
         selectedDrawingId={selectedDrawingId}
@@ -85,6 +100,8 @@ function App() {
         onDrawingDelete={handleDrawingDelete}
         onDrawingDuplicate={handleDrawingDuplicate}
         onDrawingsUpdate={loadDrawings}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(prev => !prev)}
       />
       <Canvas
         drawing={selectedDrawing}

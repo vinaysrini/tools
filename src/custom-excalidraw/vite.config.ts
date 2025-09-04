@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: './',
+  base: '/multi-excalidraw/',
   plugins: [
     react(),
     VitePWA({
@@ -21,12 +21,12 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: '/icon-192.svg',
+            src: '/multi-excalidraw/icon-192.svg',
             sizes: '192x192',
             type: 'image/svg+xml'
           },
           {
-            src: '/icon-512.svg',
+            src: '/multi-excalidraw/icon-512.svg',
             sizes: '512x512',
             type: 'image/svg+xml'
           }
@@ -45,6 +45,7 @@ export default defineConfig({
     port: 3000
   },
   build: {
-    outDir: '../../tools/multi-excalidraw'
+    outDir: '../../tools/multi-excalidraw',
+    assetsDir: 'assets'
   }
 })

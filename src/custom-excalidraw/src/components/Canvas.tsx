@@ -4,7 +4,6 @@ import type { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/typ
 import type { AppState, BinaryFiles } from '@excalidraw/excalidraw/types/types';
 import { Drawing } from '../db/database';
 import { DrawingService, FileService } from '../db/services';
-import { ExportImportService } from '../utils/exportImport';
 
 interface CanvasProps {
   drawing: Drawing | null;
@@ -48,26 +47,6 @@ export const Canvas: React.FC<CanvasProps> = ({ drawing, onDrawingUpdate }) => {
     debouncedSave([...elements], appState, files);
   }, [debouncedSave]);
 
-  const handleExport = useCallback(async (format: 'excalidraw' | 'png' | 'svg') => {
-    if (!drawing) return;
-
-    try {
-      switch (format) {
-        case 'excalidraw':
-          await ExportImportService.exportToExcalidraw(drawing, currentFiles.current);
-          break;
-        case 'png':
-          await ExportImportService.exportToPNG(drawing, currentFiles.current);
-          break;
-        case 'svg':
-          await ExportImportService.exportToSVG(drawing, currentFiles.current);
-          break;
-      }
-    } catch (error) {
-      console.error('Error exporting:', error);
-      alert('Error exporting drawing');
-    }
-  }, [drawing]);
 
   useEffect(() => {
     if (drawing) {
@@ -111,21 +90,6 @@ export const Canvas: React.FC<CanvasProps> = ({ drawing, onDrawingUpdate }) => {
 
   return (
     <div className="canvas-container">
-      <div className="canvas-header">
-        <h2>{drawing.title}</h2>
-        <div className="canvas-actions">
-          <button onClick={() => handleExport('excalidraw')} className="btn btn-secondary">
-            Export .excalidraw
-          </button>
-          <button onClick={() => handleExport('png')} className="btn btn-secondary">
-            Export PNG
-          </button>
-          <button onClick={() => handleExport('svg')} className="btn btn-secondary">
-            Export SVG
-          </button>
-        </div>
-      </div>
-      
       <div className="canvas-content">
         <Excalidraw
           key={drawing.id}

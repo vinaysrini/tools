@@ -12,6 +12,8 @@ interface SidebarProps {
   onDrawingDelete: (id: string) => void;
   onDrawingDuplicate: (drawing: Drawing) => void;
   onDrawingsUpdate: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -21,14 +23,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onDrawingCreate,
   onDrawingDelete,
   onDrawingDuplicate,
-  onDrawingsUpdate
+  onDrawingsUpdate,
+  isCollapsed,
+  onToggleCollapse
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredDrawings, setFilteredDrawings] = useState<Drawing[]>(drawings);
   const [isCreating, setIsCreating] = useState(false);
   const [newDrawingTitle, setNewDrawingTitle] = useState('');
   const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
+  const [sidebarWidth, setSidebarWidth] = useState(240);
+  const [isResizing, setIsResizing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -54,6 +61,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
   useEffect(() => {
     updateStorageInfo();
   }, []);
+
+  // Resize functionality
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      
+      const newWidth = e.clientX;
+      if (newWidth >= 180 && newWidth <= 400) {
+        setSidebarWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
 
   const updateStorageInfo = async (forceRefresh = false) => {
     try {
@@ -135,7 +173,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="sidebar">
+    <div 
+      ref={sidebarRef}
+      className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${isResizing ? 'resizing' : ''}`}
+      style={{ width: isCollapsed ? '50px' : `${sidebarWidth}px` }}
+    >
       <div className="sidebar-header">
         <h2>Drawings</h2>
         <div className="sidebar-actions">
@@ -152,6 +194,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             title="Import file"
           >
             📁
+          </button>
+          <button
+            className="btn btn-icon"
+            onClick={onToggleCollapse}
+            title="Toggle sidebar (Tab)"
+          >
+            {isCollapsed ? '▶' : '◀'}
           </button>
         </div>
       </div>
@@ -243,6 +292,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onChange={handleFileImport}
         style={{ display: 'none' }}
       />
+      
+      {!isCollapsed && (
+        <div 
+          className="sidebar-resize-handle"
+          onMouseDown={handleMouseDown}
+        />
+      )}
     </div>
   );
 };

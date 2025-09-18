@@ -25,18 +25,24 @@ export class StorageManager {
     const saved = localStorage.getItem('excalidraw-storage-config');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsedConfig = JSON.parse(saved);
+        // Merge with hardcoded credentials (fallback to environment variables)
+        parsedConfig.googleDrive = {
+          clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || parsedConfig.googleDrive?.clientId || '1098880556230-3t52mejp48hm0aton2cpvmvvsupl21m4.apps.googleusercontent.com',
+          apiKey: import.meta.env.VITE_GOOGLE_API_KEY || parsedConfig.googleDrive?.apiKey || 'AIzaSyALnzeEw5vNnBkXhzFs3HmpM2DfyTYYAaw'
+        };
+        return parsedConfig;
       } catch (error) {
         console.warn('Failed to parse storage config:', error);
       }
     }
 
-    // Default configuration - starts with local storage only
+    // Default configuration - hardcoded credentials
     return {
       provider: 'local',
       googleDrive: {
-        clientId: '', // Add your Google OAuth Client ID here when needed
-        apiKey: ''    // Add your Google Drive API Key here when needed
+        clientId: '1098880556230-3t52mejp48hm0aton2cpvmvvsupl21m4.apps.googleusercontent.com',
+        apiKey: 'AIzaSyALnzeEw5vNnBkXhzFs3HmpM2DfyTYYAaw'
       }
     };
   }

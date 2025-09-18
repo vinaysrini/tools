@@ -152,20 +152,30 @@ To enable Google Drive sync:
      - Your production domain (if deploying)
 
 3. **Configure Credentials:**
-   Since this is a pure JavaScript application, you have two options:
+   Since this is a pure JavaScript application, you have three options:
    
-   **Option A: Hardcode in StorageManager.ts (lines 38-39):**
+   **Option A: Environment Variables (Recommended):**
+   ```bash
+   # Copy the example file
+   cp .env.example .env
+   
+   # Edit .env and add your credentials
+   VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+   VITE_GOOGLE_API_KEY=your_google_api_key_here
+   ```
+   
+   **Option B: Configure via UI:**
+   - Click the ⚙️ settings button in the sidebar
+   - Click "Configure API Keys"
+   - Enter your credentials (stored in browser localStorage)
+   
+   **Option C: Hardcode in StorageManager.ts (lines 38-39):**
    ```typescript
    googleDrive: {
      clientId: 'your-google-oauth-client-id',
      apiKey: 'your-google-drive-api-key'
    }
    ```
-   
-   **Option B: Configure via UI:**
-   - Click the ⚙️ settings button in the sidebar
-   - Click "Configure API Keys"
-   - Enter your credentials
 
 4. **Test the Integration:**
    - Select "Google Drive" in storage settings

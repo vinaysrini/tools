@@ -2,8 +2,8 @@ import React, { useCallback, useEffect } from 'react';
 import { Excalidraw } from '@excalidraw/excalidraw';
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/types';
 import type { AppState, BinaryFiles } from '@excalidraw/excalidraw/types/types';
-import { Drawing } from '../db/database';
-import { DrawingService, FileService } from '../db/services';
+import { Drawing } from '../storage/types';
+import { DrawingService, FileService } from '../services/DrawingService';
 
 
 interface CanvasProps {

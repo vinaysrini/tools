@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Drawing } from '../db/database';
-import { DrawingService } from '../db/services';
+import { Drawing } from '../storage/types';
+import { DrawingService } from '../services/DrawingService';
 import { ExportImportService } from '../utils/exportImport';
 import { StorageMonitor, StorageInfo } from '../utils/storageMonitor';
 
@@ -14,6 +14,7 @@ interface SidebarProps {
   onDrawingsUpdate: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  onShowStorageSelector: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -25,7 +26,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onDrawingDuplicate,
   onDrawingsUpdate,
   isCollapsed,
-  onToggleCollapse
+  onToggleCollapse,
+  onShowStorageSelector
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredDrawings, setFilteredDrawings] = useState<Drawing[]>(drawings);
@@ -194,6 +196,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             title="Import file"
           >
             📁
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={onShowStorageSelector}
+            title="Storage settings"
+          >
+            ⚙️
           </button>
           <button
             className="btn btn-icon"

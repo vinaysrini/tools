@@ -6,7 +6,7 @@ A single-page web application for creating and managing Excalidraw drawings with
 
 - 📝 **Create, rename, duplicate, and delete drawings**
 - 🔍 **Quick search through drawings**
-- 💾 **Autosave to IndexedDB (local-first, no backend required)**
+- 💾 **Multiple storage options: Local IndexedDB or Google Drive sync**
 - 📤 **Export to .excalidraw, PNG, and SVG formats**
 - 📥 **Import from .excalidraw, PNG, and SVG files**
 - 📱 **PWA support for offline use**
@@ -16,7 +16,7 @@ A single-page web application for creating and managing Excalidraw drawings with
 
 - **Frontend**: Vite + React + TypeScript
 - **Drawing Engine**: @excalidraw/excalidraw
-- **Database**: IndexedDB via Dexie
+- **Storage**: IndexedDB via Dexie + Google Drive API
 - **PWA**: Vite PWA plugin
 - **Deployment**: Docker + Nginx
 
@@ -85,8 +85,23 @@ docker run -p 8080:80 custom-excalidraw
 - **Import**: Click the 📁 button to import .excalidraw, PNG, or SVG files
 - **Export**: Use the export buttons in the canvas header to save in different formats
 
-### Offline Use
-The application works offline thanks to PWA support. Your drawings are stored locally in IndexedDB.
+### Storage Options
+
+#### Local Storage (Default)
+- Drawings stored locally in your browser's IndexedDB
+- Works completely offline
+- No setup required
+
+#### Google Drive Sync
+- Sync drawings to your Google Drive
+- Access from multiple devices
+- Requires Google API credentials
+
+### Switching Storage Providers
+1. Click the ⚙️ (settings) button in the sidebar
+2. Select your preferred storage provider
+3. For Google Drive: configure API credentials and authenticate
+4. Optionally migrate existing drawings between providers
 
 ## Data Model
 
@@ -113,6 +128,61 @@ The application works offline thanks to PWA support. Your drawings are stored lo
 }
 ```
 
+## Configuration
+
+### Google Drive Setup (Optional)
+
+To enable Google Drive sync:
+
+1. **Get Google API Credentials:**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing one
+   - Enable Google Drive API
+   - Create OAuth 2.0 credentials
+   - Get your Client ID and API Key
+
+2. **Configure OAuth Origins (CRITICAL):**
+   - In Google Cloud Console, go to APIs & Services > Credentials
+   - Click on your OAuth 2.0 Client ID
+   - Under "Authorized JavaScript origins", add:
+     - `http://localhost:3000` (for development)
+     - Your production domain (if deploying)
+   - Under "Authorized redirect URIs", add:
+     - `http://localhost:3000` (for development)
+     - Your production domain (if deploying)
+
+3. **Configure Credentials:**
+   Since this is a pure JavaScript application, you have two options:
+   
+   **Option A: Hardcode in StorageManager.ts (lines 38-39):**
+   ```typescript
+   googleDrive: {
+     clientId: 'your-google-oauth-client-id',
+     apiKey: 'your-google-drive-api-key'
+   }
+   ```
+   
+   **Option B: Configure via UI:**
+   - Click the ⚙️ settings button in the sidebar
+   - Click "Configure API Keys"
+   - Enter your credentials
+
+4. **Test the Integration:**
+   - Select "Google Drive" in storage settings
+   - Authenticate with your Google account
+   - Your drawings will sync to Google Drive
+
+### Troubleshooting Google Drive
+
+**"Not a valid origin" Error:**
+- Add your domain to "Authorized JavaScript origins" in Google Cloud Console
+- Make sure to include the protocol (http:// or https://)
+
+**502 Bad Gateway Errors:**
+- Google APIs are temporarily unavailable
+- Try again later or check your internet connection
+- The app will automatically fall back to local storage
+
 ## Development
 
 ### Project Structure
@@ -120,8 +190,16 @@ The application works offline thanks to PWA support. Your drawings are stored lo
 src/
 ├── components/          # React components
 │   ├── Sidebar.tsx     # Drawing list and management
-│   └── Canvas.tsx      # Excalidraw canvas wrapper
-├── db/                 # Database layer
+│   ├── Canvas.tsx      # Excalidraw canvas wrapper
+│   └── StorageSelector.tsx # Storage provider selection
+├── storage/            # Storage abstraction layer
+│   ├── types.ts        # Storage interfaces
+│   ├── StorageManager.ts # Storage provider manager
+│   ├── LocalStorageProvider.ts # IndexedDB implementation
+│   └── GoogleDriveProvider.ts # Google Drive implementation
+├── services/           # Business logic services
+│   └── DrawingService.ts # Drawing operations
+├── db/                 # Legacy database layer (IndexedDB)
 │   ├── database.ts     # Dexie configuration
 │   └── services.ts     # CRUD operations
 ├── utils/              # Utilities
@@ -133,10 +211,22 @@ src/
 
 ### Key Features Implementation
 
-#### Autosave
-- Debounced save (600ms) on every change
-- Saves elements, appState, and files to IndexedDB
-- Uses Excalidraw's `onChange` callback
+#### Storage Architecture
+- **Storage Abstraction**: Common interface for different providers
+- **Provider Switching**: Runtime switching between local and cloud storage
+- **Data Migration**: Automatic migration between storage providers
+- **Autosave**: Debounced save (600ms) on every change
+
+#### Local Storage
+- Uses IndexedDB via Dexie for local persistence
+- Stores drawings and associated files locally
+- No network dependency
+
+#### Google Drive Integration
+- Stores drawings as JSON files in a dedicated folder
+- Handles authentication via Google OAuth 2.0
+- Supports file attachments and images
+- Automatic conflict resolution
 
 #### Export/Import
 - **.excalidraw**: Standard Excalidraw JSON format

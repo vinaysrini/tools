@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Canvas } from './components/Canvas';
-import { Drawing } from './db/database';
-import { DrawingService } from './db/services';
+import { StorageSelector } from './components/StorageSelector';
+import { Drawing } from './storage/types';
+import { DrawingService } from './services/DrawingService';
+import { StorageManager } from './storage/StorageManager';
 
 function App() {
   const [drawings, setDrawings] = useState<Drawing[]>([]);
@@ -10,10 +12,22 @@ function App() {
   const [selectedDrawing, setSelectedDrawing] = useState<Drawing | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [showStorageSelector, setShowStorageSelector] = useState(false);
+
+  const storageManager = StorageManager.getInstance();
 
   useEffect(() => {
-    loadDrawings();
+    initializeApp();
   }, []);
+
+  const initializeApp = async () => {
+    try {
+      await storageManager.initialize();
+      await loadDrawings();
+    } catch (error) {
+      console.error('Failed to initialize app:', error);
+    }
+  };
 
   // Keyboard shortcuts for navigation
   useEffect(() => {
@@ -82,6 +96,12 @@ function App() {
     );
   };
 
+  const handleStorageProviderChange = async () => {
+    setIsLoading(true);
+    await loadDrawings();
+    setShowStorageSelector(false);
+  };
+
   if (isLoading) {
     return (
       <div className="app-loading">
@@ -102,11 +122,28 @@ function App() {
         onDrawingsUpdate={loadDrawings}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(prev => !prev)}
+        onShowStorageSelector={() => setShowStorageSelector(true)}
       />
       <Canvas
         drawing={selectedDrawing}
         onDrawingUpdate={handleDrawingUpdate}
       />
+      {showStorageSelector && (
+        <div className="storage-modal">
+          <div className="storage-modal-content">
+            <div className="storage-modal-header">
+              <h2>Storage Settings</h2>
+              <button 
+                className="close-button"
+                onClick={() => setShowStorageSelector(false)}
+              >
+                ×
+              </button>
+            </div>
+            <StorageSelector onProviderChange={handleStorageProviderChange} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

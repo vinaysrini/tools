@@ -7,99 +7,108 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            margin: 20px;
+            margin: 8px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
 
         h1 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 30px;
+            margin-bottom: 12px;
             font-weight: 300;
+            font-size: 1.5rem;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 8px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             font-weight: 500;
             color: #555;
+            font-size: 0.8rem;
         }
 
         input[type="number"] {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 4px 6px;
+            border: 1px solid #e1e8ed;
+            border-radius: 4px;
+            font-size: 13px;
             transition: border-color 0.3s ease;
+            height: 28px;
         }
 
         input[type="number"]:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.1);
         }
 
         .input-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 8px;
         }
 
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: transform 0.2s ease;
             width: 100%;
-            margin-top: 20px;
+            margin-top: 8px;
+            height: 32px;
         }
 
         button:hover {
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
         .results {
-            margin-top: 30px;
-            padding: 20px;
+            margin-top: 10px;
+            padding: 8px;
             background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            border-left: 3px solid #667eea;
         }
 
         .result-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 8px 0;
+            margin-bottom: 4px;
+            padding: 2px 0;
             border-bottom: 1px solid #e1e8ed;
+            font-size: 0.8rem;
         }
 
         .result-item:last-child {
             border-bottom: none;
             font-weight: 600;
-            font-size: 18px;
+            font-size: 0.9rem;
             color: #2c3e50;
+            margin-top: 4px;
+            padding-top: 4px;
+            border-top: 1px solid #e1e8ed;
         }
 
         .result-label {
@@ -112,49 +121,223 @@
         }
 
         .chart-container {
-            margin-top: 30px;
-            padding: 20px;
+            margin-top: 10px;
+            padding: 8px;
             background: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
-        .chart-bar {
+        .scenario-tabs {
             display: flex;
-            align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .scenario-tab {
+            padding: 4px 8px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        .scenario-tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+
+        .scenario-tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .line-chart {
+            position: relative;
+            height: 200px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 4px;
+            padding: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke-width: 3;
+            transition: all 0.3s ease;
+        }
+
+        .chart-line.good {
+            stroke: #27ae60;
+        }
+
+        .chart-line.medium {
+            stroke: #f39c12;
+        }
+
+        .chart-line.low {
+            stroke: #e74c3c;
+        }
+
+        .chart-point {
+            r: 4;
+            transition: all 0.3s ease;
+        }
+
+        .chart-point.good {
+            fill: #27ae60;
+        }
+
+        .chart-point.medium {
+            fill: #f39c12;
+        }
+
+        .chart-point.low {
+            fill: #e74c3c;
+        }
+
+        .chart-point:hover {
+            r: 6;
+            stroke: white;
+            stroke-width: 2;
+        }
+
+        .chart-grid {
+            stroke: #e1e8ed;
+            stroke-width: 1;
+        }
+
+        .chart-axis {
+            stroke: #666;
+            stroke-width: 1;
         }
 
         .chart-label {
-            width: 100px;
             font-size: 12px;
-            color: #666;
+            fill: #666;
         }
 
-        .chart-bar-fill {
-            height: 20px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 10px;
-            margin-right: 10px;
-            min-width: 2px;
-            transition: width 0.5s ease;
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
         }
 
-        .chart-value {
-            font-size: 12px;
-            color: #666;
-            min-width: 80px;
-            text-align: right;
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 2px;
+            border-radius: 1px;
+        }
+
+        .legend-color.good {
+            background: #27ae60;
+        }
+
+        .legend-color.medium {
+            background: #f39c12;
+        }
+
+        .legend-color.low {
+            background: #e74c3c;
         }
 
         @media (max-width: 768px) {
-            .input-row {
-                grid-template-columns: 1fr;
-                gap: 15px;
+            body {
+                margin: 4px;
             }
             
             .container {
-                margin: 10px;
-                padding: 20px;
+                padding: 8px;
+                max-width: 100%;
+            }
+            
+            .input-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+            
+            .form-group {
+                margin-bottom: 6px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+                margin-bottom: 8px;
+            }
+            
+            .scenario-tabs {
+                flex-wrap: wrap;
+                gap: 2px;
+            }
+            
+            .scenario-tab {
+                padding: 3px 6px;
+                font-size: 0.7rem;
+            }
+            
+            .line-chart {
+                height: 150px;
+                padding: 6px;
+            }
+            
+            .legend {
+                gap: 8px;
+            }
+            
+            .legend-item {
+                font-size: 0.6rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 6px;
+            }
+            
+            h1 {
+                font-size: 1.2rem;
+                margin-bottom: 6px;
+            }
+            
+            .scenario-tab {
+                padding: 2px 4px;
+                font-size: 0.65rem;
+            }
+            
+            .line-chart {
+                height: 120px;
+                padding: 4px;
+            }
+            
+            input[type="number"], select {
+                font-size: 16px; /* Prevents zoom on iOS */
             }
         }
     </style>
@@ -165,24 +348,32 @@
         
         <div class="form-group">
             <label for="principal">Initial Investment ($)</label>
-            <input type="number" id="principal" placeholder="10000" min="0" step="0.01">
+            <input type="number" id="principal" placeholder="10000" min="0" step="10000">
         </div>
 
         <div class="input-row">
             <div class="form-group">
                 <label for="rate">Annual Interest Rate (%)</label>
-                <input type="number" id="rate" placeholder="5.0" min="0" step="0.01">
+                <input type="number" id="rate" placeholder="7.0" min="0" step="0.5">
             </div>
             <div class="form-group">
                 <label for="time">Time Period (years)</label>
-                <input type="number" id="time" placeholder="10" min="0" step="0.1">
+                <input type="number" id="time" placeholder="30" min="0" step="1">
             </div>
+        </div>
+
+        <div class="form-group">
+            <label for="variability">Growth Variability (%)</label>
+            <input type="number" id="variability" placeholder="3.0" min="0" step="0.5" max="10">
+            <small style="color: #666; font-size: 0.8rem; margin-top: 5px; display: block;">
+                Sets the range: Medium ± Variability (e.g., 7% ± 3% = 4% to 10%)
+            </small>
         </div>
 
         <div class="input-row">
             <div class="form-group">
                 <label for="compound">Compounding Frequency</label>
-                <select id="compound" style="width: 100%; padding: 12px; border: 2px solid #e1e8ed; border-radius: 8px; font-size: 16px;">
+                <select id="compound" style="width: 100%; padding: 4px 6px; border: 1px solid #e1e8ed; border-radius: 4px; font-size: 13px; height: 28px;">
                     <option value="1">Annually</option>
                     <option value="2">Semi-annually</option>
                     <option value="4">Quarterly</option>
@@ -193,7 +384,7 @@
             </div>
             <div class="form-group">
                 <label for="contribution">Monthly Contribution ($)</label>
-                <input type="number" id="contribution" placeholder="500" min="0" step="0.01">
+                <input type="number" id="contribution" placeholder="500" min="0" step="500">
             </div>
         </div>
 
@@ -206,118 +397,375 @@
 
         <div id="chart" class="chart-container" style="display: none;">
             <h3>📈 Growth Visualization</h3>
-            <div id="chartBars"></div>
+            <div class="scenario-tabs" id="scenarioTabs">
+                <div class="scenario-tab active" onclick="showScenario('good')" id="goodTab">Good Growth</div>
+                <div class="scenario-tab" onclick="showScenario('medium')" id="mediumTab">Medium Growth</div>
+                <div class="scenario-tab" onclick="showScenario('low')" id="lowTab">Low Growth</div>
+            </div>
+            <div class="line-chart">
+                <svg class="chart-svg" id="chartSvg"></svg>
+                <div class="chart-tooltip" id="tooltip"></div>
+            </div>
+            <div class="legend" id="chartLegend">
+                <div class="legend-item">
+                    <div class="legend-color good"></div>
+                    <span id="goodLegend">Good Growth</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color medium"></div>
+                    <span id="mediumLegend">Medium Growth</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color low"></div>
+                    <span id="lowLegend">Low Growth</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        let allScenariosData = {};
+
         function calculateCompoundInterest() {
             const principal = parseFloat(document.getElementById('principal').value) || 0;
             const rate = parseFloat(document.getElementById('rate').value) || 0;
             const time = parseFloat(document.getElementById('time').value) || 0;
             const compoundFreq = parseInt(document.getElementById('compound').value) || 12;
             const monthlyContribution = parseFloat(document.getElementById('contribution').value) || 0;
+            const variability = parseFloat(document.getElementById('variability').value) || 3.0;
 
             if (principal <= 0 && monthlyContribution <= 0) {
                 alert('Please enter a valid initial investment or monthly contribution amount.');
                 return;
             }
 
-            // Calculate compound interest with contributions
-            const annualRate = rate / 100;
-            const monthlyRate = annualRate / 12;
-            const totalMonths = time * 12;
-            
-            let totalAmount = principal;
-            let totalContributions = principal;
-            const monthlyData = [];
-            
-            // Calculate month by month for accurate results with contributions
-            for (let month = 1; month <= totalMonths; month++) {
-                totalAmount = totalAmount * (1 + monthlyRate) + monthlyContribution;
-                totalContributions += monthlyContribution;
+            // Define growth scenarios based on variability
+            const scenarios = {
+                good: rate + variability,   // Good growth: Medium + Variability
+                medium: rate,               // Medium growth: Base rate
+                low: Math.max(0, rate - variability)  // Low growth: Medium - Variability (minimum 0%)
+            };
+
+            // Update tab and legend labels with calculated rates
+            updateScenarioLabels(scenarios);
+
+            // Calculate for each scenario
+            allScenariosData = {};
+            Object.keys(scenarios).forEach(scenario => {
+                const scenarioRate = scenarios[scenario];
+                const monthlyRate = scenarioRate / 100 / 12;
+                const totalMonths = time * 12;
                 
-                // Store data for every 12th month (yearly intervals)
-                if (month % 12 === 0) {
-                    monthlyData.push({
-                        year: month / 12,
-                        amount: totalAmount,
-                        contributions: totalContributions
-                    });
+                let totalAmount = principal;
+                let totalContributions = principal;
+                const monthlyData = [];
+                
+                // Calculate month by month for accurate results with contributions
+                for (let month = 1; month <= totalMonths; month++) {
+                    totalAmount = totalAmount * (1 + monthlyRate) + monthlyContribution;
+                    totalContributions += monthlyContribution;
+                    
+                    // Store data for every 12th month (yearly intervals)
+                    if (month % 12 === 0) {
+                        monthlyData.push({
+                            year: month / 12,
+                            amount: totalAmount,
+                            contributions: totalContributions
+                        });
+                    }
                 }
-            }
 
-            const totalInterest = totalAmount - totalContributions;
-            const totalReturn = ((totalAmount - principal) / principal) * 100;
+                const totalInterest = totalAmount - totalContributions;
+                const totalReturn = ((totalAmount - principal) / principal) * 100;
 
-            // Display results
-            displayResults(principal, totalAmount, totalContributions, totalInterest, totalReturn, time);
+                allScenariosData[scenario] = {
+                    principal,
+                    totalAmount,
+                    totalContributions,
+                    totalInterest,
+                    totalReturn,
+                    time,
+                    monthlyData
+                };
+            });
+
+            // Display results for the current rate (medium scenario)
+            const currentScenario = allScenariosData.medium;
+            displayResults(currentScenario.principal, currentScenario.totalAmount, 
+                          currentScenario.totalContributions, currentScenario.totalInterest, 
+                          currentScenario.totalReturn, currentScenario.time);
             
-            // Display chart
-            displayChart(monthlyData, principal);
+            // Display chart for all scenarios
+            displayChart(allScenariosData);
+        }
+
+        function updateScenarioLabels(scenarios) {
+            // Update tab labels
+            document.getElementById('goodTab').textContent = `Good Growth (${scenarios.good.toFixed(1)}%)`;
+            document.getElementById('mediumTab').textContent = `Medium Growth (${scenarios.medium.toFixed(1)}%)`;
+            document.getElementById('lowTab').textContent = `Low Growth (${scenarios.low.toFixed(1)}%)`;
+            
+            // Update legend labels
+            document.getElementById('goodLegend').textContent = `Good Growth (${scenarios.good.toFixed(1)}%)`;
+            document.getElementById('mediumLegend').textContent = `Medium Growth (${scenarios.medium.toFixed(1)}%)`;
+            document.getElementById('lowLegend').textContent = `Low Growth (${scenarios.low.toFixed(1)}%)`;
         }
 
         function displayResults(principal, totalAmount, totalContributions, totalInterest, totalReturn, time) {
             const resultsDiv = document.getElementById('results');
             const resultItemsDiv = document.getElementById('resultItems');
             
+            // Get final amounts for each scenario
+            const goodAmount = allScenariosData.good ? allScenariosData.good.totalAmount : 0;
+            const mediumAmount = allScenariosData.medium ? allScenariosData.medium.totalAmount : 0;
+            const lowAmount = allScenariosData.low ? allScenariosData.low.totalAmount : 0;
+            
+            // Get total contributions and interest for medium scenario (they're the same for all scenarios)
+            const totalInvestments = totalContributions;
+            const interestEarned = totalInterest;
+            
             resultItemsDiv.innerHTML = `
                 <div class="result-item">
-                    <span class="result-label">Initial Investment:</span>
-                    <span class="result-value">$${principal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Total Contributions:</span>
-                    <span class="result-value">$${totalContributions.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    <span class="result-label">Total Investments:</span>
+                    <span class="result-value">$${totalInvestments.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </div>
                 <div class="result-item">
                     <span class="result-label">Interest Earned:</span>
-                    <span class="result-value">$${totalInterest.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    <span class="result-value">$${interestEarned.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </div>
                 <div class="result-item">
-                    <span class="result-label">Total Return:</span>
-                    <span class="result-value">${totalReturn.toFixed(2)}%</span>
+                    <span class="result-label">Good Final Value:</span>
+                    <span class="result-value">$${goodAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </div>
                 <div class="result-item">
-                    <span class="result-label">Final Amount:</span>
-                    <span class="result-value">$${totalAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    <span class="result-label">Medium Final Value:</span>
+                    <span class="result-value">$${mediumAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Low Final Value:</span>
+                    <span class="result-value">$${lowAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </div>
             `;
             
             resultsDiv.style.display = 'block';
         }
 
-        function displayChart(monthlyData, principal) {
+        function displayChart(scenariosData) {
             const chartDiv = document.getElementById('chart');
-            const chartBarsDiv = document.getElementById('chartBars');
             
-            if (monthlyData.length === 0) {
+            if (!scenariosData || Object.keys(scenariosData).length === 0) {
                 chartDiv.style.display = 'none';
                 return;
             }
 
-            const maxAmount = Math.max(...monthlyData.map(d => d.amount));
+            // Store scenarios data globally for tab switching
+            window.scenariosData = scenariosData;
             
-            chartBarsDiv.innerHTML = monthlyData.map(data => {
-                const widthPercent = (data.amount / maxAmount) * 100;
-                return `
-                    <div class="chart-bar">
-                        <div class="chart-label">Year ${data.year}</div>
-                        <div class="chart-bar-fill" style="width: ${widthPercent}%"></div>
-                        <div class="chart-value">$${data.amount.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
-                    </div>
-                `;
-            }).join('');
+            // Create the line chart showing all scenarios
+            createLineChart(scenariosData);
             
             chartDiv.style.display = 'block';
         }
 
+        function createLineChart(scenariosData) {
+            const svg = document.getElementById('chartSvg');
+            const tooltip = document.getElementById('tooltip');
+            
+            // Clear previous chart
+            svg.innerHTML = '';
+            
+            // Chart dimensions
+            const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+            const width = 600;
+            const height = 300;
+            
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            
+            // Find max amount and years across all scenarios
+            const allMaxAmounts = Object.values(scenariosData).map(s => 
+                Math.max(...s.monthlyData.map(d => d.amount))
+            );
+            const maxAmount = Math.max(...allMaxAmounts);
+            const maxYear = Math.max(...Object.values(scenariosData).map(s => 
+                Math.max(...s.monthlyData.map(d => d.year))
+            ));
+            
+            // Scales
+            const xScale = (year) => margin.left + (year / maxYear) * (width - margin.left - margin.right);
+            const yScale = (amount) => height - margin.bottom - (amount / maxAmount) * (height - margin.top - margin.bottom);
+            
+            // Create grid lines
+            const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            gridGroup.setAttribute('class', 'grid');
+            
+            // Vertical grid lines (years)
+            for (let year = 0; year <= maxYear; year += Math.max(1, Math.floor(maxYear / 10))) {
+                const x = xScale(year);
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x);
+                line.setAttribute('y1', margin.top);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', height - margin.bottom);
+                line.setAttribute('class', 'chart-grid');
+                gridGroup.appendChild(line);
+            }
+            
+            // Horizontal grid lines (amounts)
+            const numHorizontalLines = 6;
+            for (let i = 0; i <= numHorizontalLines; i++) {
+                const amount = (maxAmount / numHorizontalLines) * i;
+                const y = yScale(amount);
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', margin.left);
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', width - margin.right);
+                line.setAttribute('y2', y);
+                line.setAttribute('class', 'chart-grid');
+                gridGroup.appendChild(line);
+            }
+            
+            svg.appendChild(gridGroup);
+            
+            // Create axes
+            const axisGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            
+            // X-axis
+            const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            xAxis.setAttribute('x1', margin.left);
+            xAxis.setAttribute('y1', height - margin.bottom);
+            xAxis.setAttribute('x2', width - margin.right);
+            xAxis.setAttribute('y2', height - margin.bottom);
+            xAxis.setAttribute('class', 'chart-axis');
+            axisGroup.appendChild(xAxis);
+            
+            // Y-axis
+            const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            yAxis.setAttribute('x1', margin.left);
+            yAxis.setAttribute('y1', margin.top);
+            yAxis.setAttribute('x2', margin.left);
+            yAxis.setAttribute('y2', height - margin.bottom);
+            yAxis.setAttribute('class', 'chart-axis');
+            axisGroup.appendChild(yAxis);
+            
+            svg.appendChild(axisGroup);
+            
+            // Create lines and points for each scenario
+            Object.keys(scenariosData).forEach(scenario => {
+                const data = scenariosData[scenario];
+                const lineGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                
+                // Create line path
+                const pathData = data.monthlyData.map((point, index) => {
+                    const x = xScale(point.year);
+                    const y = yScale(point.amount);
+                    return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+                }).join(' ');
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathData);
+                path.setAttribute('class', `chart-line ${scenario}`);
+                lineGroup.appendChild(path);
+                
+                // Create points
+                data.monthlyData.forEach(point => {
+                    const x = xScale(point.year);
+                    const y = yScale(point.amount);
+                    
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', x);
+                    circle.setAttribute('cy', y);
+                    circle.setAttribute('class', `chart-point ${scenario}`);
+                    circle.setAttribute('data-year', point.year);
+                    circle.setAttribute('data-amount', point.amount);
+                    circle.setAttribute('data-scenario', scenario);
+                    
+                    // Add hover events
+                    circle.addEventListener('mouseenter', (e) => {
+                        const rect = svg.getBoundingClientRect();
+                        const xPos = e.clientX - rect.left;
+                        const yPos = e.clientY - rect.top;
+                        
+                        tooltip.style.left = `${xPos + 10}px`;
+                        tooltip.style.top = `${yPos - 10}px`;
+                        tooltip.innerHTML = `
+                            <strong>Year ${point.year}</strong><br>
+                            Amount: $${point.amount.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                        `;
+                        tooltip.style.opacity = '1';
+                    });
+                    
+                    circle.addEventListener('mouseleave', () => {
+                        tooltip.style.opacity = '0';
+                    });
+                    
+                    lineGroup.appendChild(circle);
+                });
+                
+                svg.appendChild(lineGroup);
+            });
+            
+            // Add axis labels
+            const labelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            
+            // X-axis labels (years)
+            for (let year = 0; year <= maxYear; year += Math.max(1, Math.floor(maxYear / 10))) {
+                const x = xScale(year);
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', x);
+                text.setAttribute('y', height - margin.bottom + 20);
+                text.setAttribute('class', 'chart-label');
+                text.setAttribute('text-anchor', 'middle');
+                text.textContent = year;
+                labelGroup.appendChild(text);
+            }
+            
+            // Y-axis labels (amounts)
+            for (let i = 0; i <= numHorizontalLines; i++) {
+                const amount = (maxAmount / numHorizontalLines) * i;
+                const y = yScale(amount);
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', margin.left - 10);
+                text.setAttribute('y', y + 4);
+                text.setAttribute('class', 'chart-label');
+                text.setAttribute('text-anchor', 'end');
+                text.textContent = `$${(amount / 1000).toFixed(0)}k`;
+                labelGroup.appendChild(text);
+            }
+            
+            svg.appendChild(labelGroup);
+        }
+
+        function showScenario(scenario) {
+            // Update active tab
+            document.querySelectorAll('.scenario-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Highlight the selected scenario line
+            document.querySelectorAll('.chart-line').forEach(line => {
+                line.style.opacity = '0.3';
+            });
+            document.querySelectorAll('.chart-point').forEach(point => {
+                point.style.opacity = '0.3';
+            });
+            
+            document.querySelectorAll(`.chart-line.${scenario}`).forEach(line => {
+                line.style.opacity = '1';
+            });
+            document.querySelectorAll(`.chart-point.${scenario}`).forEach(point => {
+                point.style.opacity = '1';
+            });
+        }
+
         // Add some default values for demonstration
         window.onload = function() {
-            document.getElementById('principal').value = '10000';
+            document.getElementById('principal').value = '5000';
             document.getElementById('rate').value = '7';
-            document.getElementById('time').value = '20';
-            document.getElementById('contribution').value = '500';
+            document.getElementById('time').value = '30';
+            document.getElementById('compound').value = '12'; // Monthly compounding
+            document.getElementById('contribution').value = '300';
+            document.getElementById('variability').value = '3.0'; // 3% variability
         };
     </script>
 </body>

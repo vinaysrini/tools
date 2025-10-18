@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compound Interest Calculator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        .result-label {
+            color: #666;
+        }
+
+        .result-value {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .chart-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .chart-label {
+            width: 100px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .chart-bar-fill {
+            height: 20px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            margin-right: 10px;
+            min-width: 2px;
+            transition: width 0.5s ease;
+        }
+
+        .chart-value {
+            font-size: 12px;
+            color: #666;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .input-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Compound Interest Calculator</h1>
+        
+        <div class="form-group">
+            <label for="principal">Initial Investment ($)</label>
+            <input type="number" id="principal" placeholder="10000" min="0" step="0.01">
+        </div>
+
+        <div class="input-row">
+            <div class="form-group">
+                <label for="rate">Annual Interest Rate (%)</label>
+                <input type="number" id="rate" placeholder="5.0" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="time">Time Period (years)</label>
+                <input type="number" id="time" placeholder="10" min="0" step="0.1">
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="form-group">
+                <label for="compound">Compounding Frequency</label>
+                <select id="compound" style="width: 100%; padding: 12px; border: 2px solid #e1e8ed; border-radius: 8px; font-size: 16px;">
+                    <option value="1">Annually</option>
+                    <option value="2">Semi-annually</option>
+                    <option value="4">Quarterly</option>
+                    <option value="12" selected>Monthly</option>
+                    <option value="52">Weekly</option>
+                    <option value="365">Daily</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="contribution">Monthly Contribution ($)</label>
+                <input type="number" id="contribution" placeholder="500" min="0" step="0.01">
+            </div>
+        </div>
+
+        <button onclick="calculateCompoundInterest()">Calculate Compound Interest</button>
+
+        <div id="results" class="results" style="display: none;">
+            <h3>📊 Investment Results</h3>
+            <div id="resultItems"></div>
+        </div>
+
+        <div id="chart" class="chart-container" style="display: none;">
+            <h3>📈 Growth Visualization</h3>
+            <div id="chartBars"></div>
+        </div>
+    </div>
+
+    <script>
+        function calculateCompoundInterest() {
+            const principal = parseFloat(document.getElementById('principal').value) || 0;
+            const rate = parseFloat(document.getElementById('rate').value) || 0;
+            const time = parseFloat(document.getElementById('time').value) || 0;
+            const compoundFreq = parseInt(document.getElementById('compound').value) || 12;
+            const monthlyContribution = parseFloat(document.getElementById('contribution').value) || 0;
+
+            if (principal <= 0 && monthlyContribution <= 0) {
+                alert('Please enter a valid initial investment or monthly contribution amount.');
+                return;
+            }
+
+            // Calculate compound interest with contributions
+            const annualRate = rate / 100;
+            const monthlyRate = annualRate / 12;
+            const totalMonths = time * 12;
+            
+            let totalAmount = principal;
+            let totalContributions = principal;
+            const monthlyData = [];
+            
+            // Calculate month by month for accurate results with contributions
+            for (let month = 1; month <= totalMonths; month++) {
+                totalAmount = totalAmount * (1 + monthlyRate) + monthlyContribution;
+                totalContributions += monthlyContribution;
+                
+                // Store data for every 12th month (yearly intervals)
+                if (month % 12 === 0) {
+                    monthlyData.push({
+                        year: month / 12,
+                        amount: totalAmount,
+                        contributions: totalContributions
+                    });
+                }
+            }
+
+            const totalInterest = totalAmount - totalContributions;
+            const totalReturn = ((totalAmount - principal) / principal) * 100;
+
+            // Display results
+            displayResults(principal, totalAmount, totalContributions, totalInterest, totalReturn, time);
+            
+            // Display chart
+            displayChart(monthlyData, principal);
+        }
+
+        function displayResults(principal, totalAmount, totalContributions, totalInterest, totalReturn, time) {
+            const resultsDiv = document.getElementById('results');
+            const resultItemsDiv = document.getElementById('resultItems');
+            
+            resultItemsDiv.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Initial Investment:</span>
+                    <span class="result-value">$${principal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Contributions:</span>
+                    <span class="result-value">$${totalContributions.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Interest Earned:</span>
+                    <span class="result-value">$${totalInterest.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Return:</span>
+                    <span class="result-value">${totalReturn.toFixed(2)}%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Final Amount:</span>
+                    <span class="result-value">$${totalAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        function displayChart(monthlyData, principal) {
+            const chartDiv = document.getElementById('chart');
+            const chartBarsDiv = document.getElementById('chartBars');
+            
+            if (monthlyData.length === 0) {
+                chartDiv.style.display = 'none';
+                return;
+            }
+
+            const maxAmount = Math.max(...monthlyData.map(d => d.amount));
+            
+            chartBarsDiv.innerHTML = monthlyData.map(data => {
+                const widthPercent = (data.amount / maxAmount) * 100;
+                return `
+                    <div class="chart-bar">
+                        <div class="chart-label">Year ${data.year}</div>
+                        <div class="chart-bar-fill" style="width: ${widthPercent}%"></div>
+                        <div class="chart-value">$${data.amount.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            chartDiv.style.display = 'block';
+        }
+
+        // Add some default values for demonstration
+        window.onload = function() {
+            document.getElementById('principal').value = '10000';
+            document.getElementById('rate').value = '7';
+            document.getElementById('time').value = '20';
+            document.getElementById('contribution').value = '500';
+        };
+    </script>
+</body>
+</html>
